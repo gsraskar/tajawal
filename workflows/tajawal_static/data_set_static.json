@@ -1,0 +1,91 @@
+{
+  "data_sets": [
+    {
+      "data_set_name": "dim_groups",
+      "fields": [
+        {
+          "fieldName": "store_id",
+          "jsonKeyName": "stores=>storeId",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "store_name",
+          "jsonKeyName": "stores=>name",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "group_id",
+          "jsonKeyName": "groupId",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "group_name",
+          "jsonKeyName": "name",
+          "index": 3,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "currency",
+          "jsonKeyName": "stores=>currency",
+          "index": 4,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "site",
+          "jsonKeyName": "stores=>site",
+          "index": 5,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "type",
+          "jsonKeyName": "stores=>type",
+          "index": 6,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "amd_office",
+          "jsonKeyName": "stores=>amdOffice",
+          "index": 7,
+          "keyValueFlag": "key"
+        }
+      ]
+    },
+    {
+      "data_set_name": "dim_payment_status",
+      "fields": [
+        {
+          "fieldName": "payment_status_id",
+          "jsonKeyName": "key",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_status",
+          "jsonKeyName": "value",
+          "index": 1,
+          "keyValueFlag": "key"
+        }
+      ]
+    },
+    {
+      "data_set_name": "dim_status",
+      "fields": [
+        {
+          "fieldName": "status_id",
+          "jsonKeyName": "key",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "status",
+          "jsonKeyName": "value",
+          "index": 1,
+          "keyValueFlag": "key"
+        }
+      ]
+    }
+  ]
+}

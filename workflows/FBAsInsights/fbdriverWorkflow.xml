@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="DriverWorkflowTajawalFacebook.xml">
+  <start to="recordCurrTime"/>
+ <!--start to="uplaodToMysql"/-->
+
+<!-- Fork-1 goes to join 1 -->
+<action name="recordCurrTime">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${currTimeScript}</exec>
+     <file>${currTimeScriptPath}#${currTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="getExecTime"/>
+     <error to="kill-1"/>
+</action>
+<action name="getExecTime">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${getExecTimeScript}</exec>
+     <argument>facebook</argument>
+     <file>${getExecTimeScriptPath}#${getExecTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="modifyConfig"/>
+     <error to="kill-1"/>
+</action>
+<action name="modifyConfig">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${modifyConfigScript}</exec>
+        <argument>${wf:actionData("getExecTime")["exec_time"]}</argument>
+        <argument>${wf:actionData("recordCurrTime")["curr_time"]}</argument>
+	<argument>facebookIntermediate</argument>
+        <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+     <file>${modifyConfigScriptPath}#${modifyConfigScript}</file>
+<capture-output/>
+  </shell>
+     <ok to="facebook_download"/>
+     <error to="kill-1"/>
+</action>
+
+<action name="facebook_download">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/FBAdsInsightWorkflow.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="facebook_mapreduce"/>
+  <error to="handleFailure"/>
+</action>
+<action name="facebook_mapreduce">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/mongoTransform.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="uplaodToMysql"/>
+  <error to="handleFailure"/>
+</action>
+<action name="uplaodToMysql">
+    <sub-workflow>
+        <app-path>${oozieProjectRoot}/commonWorkflows/mysqlUploadWorkflow.xml</app-path>
+<propagate-configuration/>
+    </sub-workflow>
+    <ok to="recordExecTime"/>
+    <error to="handleFailure"/>
+</action>
+<action name="recordExecTime">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${recordExecTimeScript}</exec>
+     <argument>${wf:actionData("recordCurrTime")["curr_time"]}</argument>
+     <argument>facebook</argument>
+     <file>${recordExecTimeScriptPath}#${recordExecTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="end"/>
+     <error to="kill-1"/>
+</action>
+
+ <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>facebook</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <kill name="kill-1">
+    <message>Some failure occurred</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+
+
+

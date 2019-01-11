@@ -1,0 +1,207 @@
+<workflow-app name="mongoTransform-${module}" xmlns="uri:oozie:workflow:0.2">
+	<start to="ctrl-jumpto"/>
+<!--start to="decision-2"/-->
+	<decision name="ctrl-jumpto">
+		<switch>
+			<case to="mongo-pull">
+				${wf:conf("jump.to") eq "mongo"}
+			</case>
+			<case to="bson-input">
+				${wf:conf("jump.to") eq "bson"}
+			</case>
+			 <case to="loadToHive">
+                                ${wf:conf("jump.to") eq "hive"}
+                        </case>
+			<case to="loadToHiveIncremental">
+                                ${wf:conf("jump.to") eq "hive2"}
+                        </case>
+                        <case to="decision-3">
+                                ${wf:conf("jump.to") eq "directETL"}
+                        </case>
+			<default to="shell-crunch-action" />
+		</switch>
+	</decision>
+        <action name="mongo-pull">
+                <fs>
+                        <mkdir path='/tmp/mongo-pull'/>
+                </fs>
+                <ok to='shell-crunch-action'/>
+                <error to='kill'/>
+        </action>
+        <action name="bson-input">
+                <shell xmlns="uri:oozie:shell-action:0.1">
+                         <job-tracker>${jobTracker}</job-tracker>
+                         <name-node>${nameNode}</name-node>
+                         <exec>copy.sh</exec>
+                         <argument>key.pem</argument>
+                         <argument>${user_ip}</argument>
+                         <argument>${src_loc}</argument>
+                         <argument>${dest_loc}</argument>
+                         <file>${copyScriptPath}#copy.sh</file>
+                         <file>${pemFile}#key.pem</file>
+                </shell>
+                <ok to='shell-crunch-action'/>
+                <error to='kill'/>
+        </action>
+
+	<action name="shell-crunch-action">
+	<shell xmlns="uri:oozie:shell-action:0.2">
+                         <job-tracker>${jobTracker}</job-tracker>
+                         <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                        <exec>${mapreduceExecutorScriptName}</exec>
+                  <argument>${dataSetPath}</argument>
+                  <argument>${inPutPath}</argument>
+                  <argument>${outPutPath}</argument>
+                  <argument>${inputDataType}</argument>
+                  <argument>${libHdfsDirPath}</argument>
+		<env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                  <file>${mapreduceExecutorScriptPath}#${mapreduceExecutorScriptName}</file>
+                </shell>
+                <ok to="decision-2"/>
+                <error to="kill"/>
+        </action>
+
+        <action name="java-crunch-action">
+                <java>
+                         <job-tracker>${jobTracker}</job-tracker>
+                         <name-node>${nameNode}</name-node>
+                         <prepare>
+                                   <delete path="${outPutPath}"/>
+                         </prepare>
+                         <main-class>com.tajawal.hotel.mapreduce.HotelDriver</main-class>
+			 <!--arg>-Dyarn.resourcemanager.address=${jobTracker}</arg>
+			 <arg>-Dmapreduce.framework.name=yarn</arg>
+			 <arg>-DHADOOP_USER_NAME=yarn</arg>
+			 <arg>-DHADOOP_MAPRED_HOME=/usr/hdp/2.5.3.0-37/hadoop-mapreduce/</arg-->
+                         <arg>-Ddataset.schema.path=${dataSetPath}</arg>
+                         <arg>${inPutPath}</arg>
+                         <arg>${outPutPath}</arg>
+                         <arg>${inputDataType}</arg>
+                </java>
+                <ok to="decision-2"/>
+                <error to="kill"/>
+        </action>
+<!--action name="shell-crunch-action">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+                         <job-tracker>${jobTracker}</job-tracker>
+                         <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                        <exec>${mapreduceExecutorScriptName}</exec>
+                  <argument>${dataSetPath}</argument>
+                  <argument>${inPutPath}</argument>
+                  <argument>${outPutPath}</argument>
+                  <argument>${inputDataType}</argument>
+                  <argument>${libHdfsDirPath}</argument>
+                <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                  <file>${mapreduceExecutorScriptPath}#${mapreduceExecutorScriptName}</file>
+                </shell>
+                <ok to="decision-2"/>
+                <error to="kill"/>
+        </action-->
+
+<decision name="decision-2">
+    <switch>
+      <case to="loadToHive">${loadTohive2 eq 'no'}</case>
+      <case to="loadToHiveIncremental">${loadTohive2 eq 'yes'}</case>
+      <default to="loadToHive"/>
+    </switch>
+  </decision>
+
+ <action name="loadToHiveIncremental">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${loadToHiveActionScript}</exec>
+                <argument>${hiveDB}</argument>
+                <argument>${hiveLoadTableName}</argument>
+		<argument>${hiveLoadPath}</argument>
+		<argument>${hiveLoadFilename}</argument>
+
+                 <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${loadToHiveActionScriptPath}#${loadToHiveActionScript}</file>
+                </shell>
+                <ok to="decision-3"/>
+                <error to="kill"/>
+        </action>
+ <action name="executeHiveScript">
+    <hive xmlns="uri:oozie:hive-action:0.5">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <job-xml>${hiveSiteConfigPath}</job-xml>
+      <script>${hiveScript}</script>
+      <param>hiveDB=${hiveDB}</param>
+    </hive>
+    <ok to="end"/>
+    <error to="kill"/>
+  </action>
+
+        <action name="loadToHive">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${loadToHiveActionScript}</exec>
+                <argument>${outPutPath}</argument>
+                <argument>${dataSetPath}</argument>
+                <argument>${hiveDB}</argument>
+                 <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${loadToHiveActionScriptPath}#${loadToHiveActionScript}</file>
+                </shell>
+                <ok to="decision-3"/>
+                <error to="kill"/>
+        </action>
+
+<decision name="decision-3">
+    <switch>
+      <case to="executeHiveScript">${executeHiveScript eq 'yes'}</case>
+      <case to="end">${executeHiveScript eq 'no'}</case>
+      <default to="end"/>
+    </switch>
+  </decision>
+
+
+        <kill name="kill">
+		<message>Workflow failed</message>
+	</kill>
+
+	<end name="end" />
+</workflow-app>
+

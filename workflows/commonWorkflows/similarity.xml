@@ -1,0 +1,22 @@
+
+<workflow-app name="similarity" xmlns="uri:oozie:workflow:0.2">
+	<start to="execute-sim" />
+
+        <action name="execute-sim">
+                <java>
+                  <job-tracker>${jobTracker}</job-tracker>
+                  <name-node>${nameNode}</name-node>
+                  <main-class>com.tajawal.similarity.App</main-class>
+                  <arg>${sim_input}</arg>
+                  <arg>${sim_output}</arg>
+                  <arg>${sim_thres}</arg>
+                </java>
+                <ok to="end"/>
+                <error to="kill"/>
+        </action>
+        <kill name="kill">
+                <message>Workflow failed</message>
+        </kill>
+        <end name="end" />
+</workflow-app>
+

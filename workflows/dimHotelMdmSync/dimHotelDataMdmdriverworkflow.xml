@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="DriverWorkflowDimHotelDataMDM">
+  <start to="DimHotelMdmSqoopImport"/>
+ 
+<action name="DimHotelMdmSqoopImport">
+  <sub-workflow>
+    	<app-path>${oozieProjectRoot}/dimHotelMdmSync/dimHotelDataMdmSqoopImport.xml</app-path>
+	<propagate-configuration/>
+  </sub-workflow>
+  <ok to="DimHotelMdmHiveScript"/>
+  <error to="handleFailure"/>
+</action>
+
+<action name="DimHotelMdmHiveScript">
+  <sub-workflow>
+        <app-path>${oozieProjectRoot}/dimHotelMdmSync/dimHotelDataMdmHiveScript.xml</app-path>
+        <propagate-configuration/>
+  </sub-workflow>
+  <ok to="DimHotelMdmSqoopExport"/>
+  <error to="handleFailure"/>
+</action>
+
+<action name="DimHotelMdmSqoopExport">
+  <sub-workflow>
+        <app-path>${oozieProjectRoot}/dimHotelMdmSync/dimHotelDataMdmSqoopExport.xml</app-path>
+        <propagate-configuration/>
+  </sub-workflow>
+  <ok to="end"/>
+  <error to="handleFailure"/>
+</action>
+
+ <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <kill name="kill-1">
+    <message>Some failure occurred</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+
+
+

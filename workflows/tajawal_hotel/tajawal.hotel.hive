@@ -1,0 +1,21 @@
+
+Drop table if exists tajawal_bi.fact_hotel_orders;
+create table if not exists tajawal_bi.fact_hotel_orders(order_no String,dim_group_id String,order_type String,office_id String,site_id String,dim_product_category_type String,dim_bookingdate_id String,dim_booking_hour String,dim_booking_timestamp String,dim_hotel_id String,dim_supplier_id String,dim_vendor_id String,dim_supplier_currency String,dim_customer_id String,dim_store_id String,dim_language_id String,dim_checkin_date_id String,dim_checkin_hour String,dim_checkout_date_id String,dim_checkout_hour String,dim_total_currency String,dim_request_currency_id String,dim_promo_id String,dim_status_id String,dim_state_id String,dim_bookingtype_id String,dim_cancellation_policy String,dim_ratetype String,dim_markup_currency String,dim_paymentstatus_id String,payment_amount double,booking_value double,supplier_cost double,conversion_rate_aed double,conversion_rate_usd double,room_count int,length_of_stay int,booking_window int,pax_count int,discount_amount double,payment_amount_usd double,discount_amount_usd double,iov double,gbv double)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+Drop table if exists tajawal_bi.fact_flight_orders;
+create table if not exists tajawal_bi.fact_flight_orders(order_type String,dim_group_id String,order_no String,dim_office_id String,dim_bookingdate_id String,dim_booking_hour String,dim_booking_timestamp String,dim_travel_date String,dim_travel_hour String,site_id String,dim_store_id String,dim_promo_id String,dim_customer_id String,dim_language String,dim_origin String,dim_destination String,dim_flightcode_leg1 String,dim_airline_leg1 String,dim_flightcode_leg2 String,dim_airlinecode_leg2 String,dim_trip_type String,dim_journey_type String,dim_totals_currency String,dim_status_id String,dim_paymentstatus_id String,dim_state_id String,conversion_rate_aed double,conversion_rate_usd double,payment_amount double,adult_count int,children_count int,infants_count int,no_of_passengers int,total_seat int,no_of_legs int,no_of_segments int,discount_amount double,booking_window int,payment_amount_usd double,discount_amount_usd double,iov double,gbv double)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+Drop table if exists tajawal_bi.dim_hotel;
+create table if not exists tajawal_bi.dim_hotel(dim_hotel_id String,name String,address String,city String,district String,country_code String,star_rating String,longitude String,latitude String,zipcode String)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+Drop table if exists tajawal_bi.dim_customer;
+create table if not exists tajawal_bi.dim_customer(dim_customer_id String,email String,firstname String,lastname String,phone String,title String,country String)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+Drop table if exists tajawal_bi.dim_room;
+create table if not exists tajawal_bi.dim_room(room_id String,name String,room_class String,room_type String)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;

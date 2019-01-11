@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="bingHiveUploadAndDataTransform">
+<start to="loadToHive"/>
+
+  <action name="loadToHive">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${loadToHiveActionScript}</exec>
+                <argument>${hiveDB}</argument>
+		<argument>${bingTable1}</argument>
+		<argument>${outPath}</argument>
+                           
+                <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${loadToHiveActionScriptPath}#${loadToHiveActionScript}</file>
+                </shell>
+                <ok to="executeHiveScript"/>
+                <error to="fail"/>
+        </action>
+
+    	<action name="executeHiveScript">
+          <hive xmlns="uri:oozie:hive-action:0.5">
+           <job-tracker>${jobTracker}</job-tracker>
+           <name-node>${nameNode}</name-node>
+           <job-xml>${hiveSiteConfigPath}</job-xml>
+           <script>${hiveScript}</script>
+           <param>hiveDB=${hiveDB}</param>
+         </hive>
+        <ok to="sqoopExportBing"/>
+        <error to="fail"/>
+       </action>
+
+       <action name="sqoopExportBing">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlTableA} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTableA}/" --input-fields-terminated-by "\001" --input-null-string NULL --input-null-non-string NULL</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="executeHiveScript2"/>
+    <error to="fail"/>
+  </action>
+
+ <action name="executeHiveScript2">
+    <hive xmlns="uri:oozie:hive-action:0.5">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <job-xml>${hiveSiteConfigPath}</job-xml>
+      <script>${hiveScript2}</script>
+      <param>hiveDB=${hiveDB}</param>
+    </hive>
+    <ok to="end"/>
+    <error to="fail"/>
+    </action>
+
+
+   <kill name="fail">
+  	<message>workflow failed</message>
+   </kill>
+  <end name="end"/>
+
+</workflow-app>

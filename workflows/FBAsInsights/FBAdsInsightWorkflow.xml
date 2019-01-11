@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="localFSToMySQLorHIVE.xml">
+  <start to="java-1"/>
+  <action name="localFStoHDFC">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${copyScript}</exec>
+      <argument>${localFSDirectory}</argument>
+      <argument>${HDFSFilePath}</argument>
+      <file>${copyScriptPath}#${copyScript}</file>
+      <file>${pemFile}#key.pem</file>
+    </shell>
+    <ok to="end"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${handleFailureScript}</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailureScriptPath}#${handleFailureScript}</file>
+    </shell>
+    <ok to="end"/>
+    <error to="end"/>
+  </action>
+  <action name="java-1">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>${ClassPath}</main-class>
+      <arg>--selection-config-file</arg>
+      <arg>${ResourceFile}</arg>
+      <arg>--output-file-path</arg>
+      <arg>${localFSPath}</arg>
+      <arg>--ad_object_id</arg>
+      <arg>${ObjectID}</arg>
+      <arg>--access_token</arg>
+      <arg>${AccessToken}</arg>
+      <file>${ResourceFilePath}#${ResourceFile}</file>
+    </java>
+    <ok to="decision-1"/>
+    <error to="handleFailure"/>
+  </action>
+  <decision name="decision-1">
+    <switch>
+      <case to="localFStoHDFC">${UploadtoHDFS eq 'true'}</case>
+      <default to="end"/>
+    </switch>
+  </decision>
+  <end name="end"/>
+</workflow-app>
+<!--
+     <workflow>
+  <node name="start" x="20" y="245"/>
+  <node name="localFStoHDFC" x="448" y="173"/>
+  <node name="handleFailure" x="294" y="334"/>
+  <node name="java-1" x="195" y="202"/>
+  <node name="decision-1" x="309" y="192"/>
+  <node name="end" x="579" y="242"/>
+</workflow>-->

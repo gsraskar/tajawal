@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="DriverWorkflowTajawal-${module}.xml">
+  <start to="tajawal_mapreduce"/>
+  <!--start to="tajawal_hive"/-->
+  <!--start to="fork-mysql-upload"/-->
+  <!--start to="tajawal_sim"/-->
+  <!--start to="management_KPI_input"/-->
+  <!--start to="customer_analysis"/-->
+ 
+<!-- Fork-1 goes to join 1 -->
+<action name="kpiSummaryAction">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${kpiSummaryScript}</exec>
+      <argument>${oozieProjectRoot}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <file>${kpiSummaryScriptPath}#${kpiSummaryScript}</file>
+    </shell>
+    <ok to="sqoopExportList"/>
+    <error to="handleFailure"/>
+  </action>
+
+<action name="tajawal_mapreduce">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/mongoTransform.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="tajawal_hive"/>
+  <error to="handleFailure"/>
+</action>
+<action name="tajawal_hive">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/hiveScriptWorkflow.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="tajawal_sim"/>
+  <error to="handleFailure"/>
+</action>
+<action name="tajawal_sim">
+  <sub-workflow>
+    <app-path>${similarity_wf}</app-path>
+    <propagate-configuration/>
+  </sub-workflow>
+  <ok to="hotel_mapping"/>
+  <error to="handleFailure"/>
+</action>
+<action name="hotel_mapping">
+    <hive xmlns="uri:oozie:hive-action:0.5">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <job-xml>${hiveSiteConfigPath}</job-xml>
+      <script>${hotelMappingscript}</script>
+     <param>hiveDB=${hiveDB}</param>
+    </hive>
+    <ok to="fork-mysql-upload"/>
+    <error to="handleFailure"/>
+  </action>
+<!--action name="hotel_mapping">
+  <sub-workflow>
+    <app-path>${hivescript_wf}</app-path>
+    <propagate-configuration/>
+    <configuration>
+      <property>
+        <name>hiveScript</name>
+        <value>${hotelMappingscript}</value>
+      </property>
+</configuration>
+  </sub-workflow>
+  <ok to="fork-mysql-upload"/>
+  <error to="handleFailure"/>
+</action-->
+<!--fork name="fork-hive-exec">
+      <path start="customer_analysis"/>
+      <path start="management_KPI_input"/>
+</fork-->
+<action name="customer_analysis">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/commonWorkflow_mysql_upload2.xml</app-path>
+    <propagate-configuration/>
+    <configuration>
+      <property>
+        <name>module</name>
+        <value>tajawal_customer_analysis</value>
+      </property>
+      <property>
+        <name>uploadMySQLTable2A</name>
+        <value>true</value>
+      </property>
+      <property>
+        <name>hiveTable2A</name>
+        <value>${custAnalysishiveTableA}</value>
+      </property>
+      <property>
+        <name>mysqlIntermediateTable2A</name>
+        <value>${custAnalysisMysqlInterTableA}</value>
+      </property>
+      <property>
+        <name>mysqlFinalTable2A</name>
+        <value>${custAnalysisMysqlTableA}</value>
+      </property>
+      <property>
+        <name>uploadMySQLTable2B</name>
+        <value>true</value>
+      </property>
+            <property>
+        <name>hiveTable2B</name>
+        <value>${custAnalysishiveTableB}</value>
+      </property>
+      <property>
+        <name>mysqlIntermediateTable2B</name>
+        <value>${custAnalysisMysqlInterTableB}</value>
+      </property>
+      <property>
+        <name>mysqlFinalTable2B</name>
+        <value>${custAnalysisMysqlTableB}</value>
+      </property>
+      <property>
+        <name>uploadMySQLTable2C</name>
+        <value>true</value>
+      </property>
+            <property>
+        <name>hiveTable2C</name>
+        <value>${custAnalysishiveTableC}</value>
+      </property>
+      <property>
+        <name>mysqlIntermediateTable2C</name>
+        <value>${custAnalysisMysqlInterTableC}</value>
+      </property>
+      <property>
+        <name>mysqlFinalTable2C</name>
+        <value>${custAnalysisMysqlTableC}</value>
+      </property>
+      <property>
+        <name>uploadMySQLTable2D</name>
+        <value>true</value>
+      </property>
+            <property>
+        <name>hiveTable2D</name>
+        <value>${custAnalysishiveTableD}</value>
+      </property>
+      <property>
+        <name>mysqlIntermediateTable2D</name>
+        <value>${custAnalysisMysqlInterTableD}</value>
+      </property>
+      <property>
+        <name>mysqlFinalTable2D</name>
+        <value>${custAnalysisMysqlTableD}</value>
+      </property>
+      <property>
+        <name>uploadMySQLTable2E</name>
+        <value>true</value>
+      </property>
+            <property>
+        <name>hiveTable2E</name>
+        <value>${custAnalysishiveTableE}</value>
+      </property>
+      <property>
+        <name>mysqlIntermediateTable2E</name>
+        <value>${custAnalysisMysqlInterTableE}</value>
+      </property>
+      <property>
+        <name>mysqlFinalTable2E</name>
+        <value>${custAnalysisMysqlTableE}</value>
+      </property>
+      <property>
+        <name>uploadMySQLTable2F</name>
+        <value>false</value>
+      </property>
+      <property>
+        <name>hiveScriptB</name>
+        <value>${customerAnalysisHiveScript}</value>
+      </property>
+     <property>
+        <name>hiveDB</name>
+        <value>${hiveDB}</value>
+      </property>      
+    </configuration>
+  </sub-workflow>
+  <ok to="end"/>
+  <error to="handleFailure"/>
+</action>
+<action name="management_KPI_input">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/commonWorkflow_mysql_upload.xml</app-path>
+    <propagate-configuration/>
+    <configuration>
+      <property>
+        <name>module</name>
+        <value>manageMentKPI_Input</value>
+      </property>
+      <property>
+        <name>uploadMySQLTableA</name>
+        <value>true</value>
+      </property>
+      <property>
+        <name>hiveTableA</name>
+        <value>${kpiMgmthiveTable}</value>
+      </property>
+      <property>
+        <name>mysqlIntermediateTableA</name>
+        <value>${kpiMgmtInterTable}</value>
+      </property>
+      <property>
+        <name>mysqlFinalTableA</name>
+        <value>${kpiMgmtmysqlTable}</value>
+      </property>
+      <property>
+        <name>uploadMySQLTableB</name>
+        <value>true</value>
+      </property>
+            <property>
+        <name>hiveTableB</name>
+        <value>${kpiMgmthiveTableB}</value>
+      </property>
+      <property>
+        <name>mysqlIntermediateTableB</name>
+        <value>${kpiMgmtMysqlInterTableB}</value>
+      </property>
+      <property>
+        <name>mysqlFinalTableB</name>
+        <value>${kpiMgmtMysqlTableB}</value>
+      </property>
+      <property>
+        <name>uploadMySQLTableC</name>
+        <value>true</value>
+      </property>
+            <property>
+        <name>hiveTableC</name>
+        <value>${kpiMgmthiveTableC}</value>
+      </property>
+      <property>
+        <name>mysqlIntermediateTableC</name>
+        <value>${kpiMgmtMysqlInterTableC}</value>
+      </property>
+      <property>
+        <name>mysqlFinalTableC</name>
+        <value>${kpiMgmtMysqlTableC}</value>
+      </property>
+      <property>
+        <name>hiveScriptA</name>
+        <value>${kpimgmtHiveScript}</value>
+      </property>
+      <property>
+        <name>hiveDB</name>
+        <value>${hiveDB}</value>
+      </property> 
+    </configuration>
+  </sub-workflow>
+  <ok to="kpiSummaryAction"/>
+  <error to="handleFailure"/>
+</action>
+<!--join name="join-hive-exec" to="kpiSummaryAction"/-->
+<fork name="fork-mysql-upload">
+      <path start="uplaodToMysql1"/>
+      <path start="uplaodToMysql2"/>
+</fork>
+<action name="uplaodToMysql1">
+    <sub-workflow>
+        <app-path>${oozieProjectRoot}/commonWorkflows/mysqlUploadWorkflow.xml</app-path>
+	<propagate-configuration/>
+    </sub-workflow>
+    <ok to="join-mysql-upload"/>
+    <error to="handleFailure"/>
+</action>
+<action name="uplaodToMysql2">
+    <sub-workflow>
+        <app-path>${oozieProjectRoot}/commonWorkflows/mysqlUploadWorkflow2.xml</app-path>
+	<propagate-configuration/>
+    </sub-workflow>
+    <ok to="join-mysql-upload"/>
+    <error to="handleFailure"/>
+</action>
+<join name="join-mysql-upload" to="management_KPI_input"/>
+<action name="sqoopExportList">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                         <job-tracker>${jobTracker}</job-tracker>
+                         <name-node>${nameNode}</name-node>
+                      <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+
+                         <exec>sqoopExportList.sh</exec>
+                         <argument>${sqoopExportListFilePath}</argument>
+                         <file>${sqoopExportScriptPath}#sqoopExportList.sh</file>
+                </shell>
+                <ok to='customer_analysis'/>
+                <error to='handleFailure'/>
+</action>
+ <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <kill name="kill-1">
+    <message>Some failure occurred</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+
+
+

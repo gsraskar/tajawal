@@ -1,0 +1,2308 @@
+{
+  "data_sets": [
+    {
+"data_set_name": "fact_hotel_orders",
+      "fields": [
+        {
+          "fieldName": "id",
+          "jsonKeyName": "trackId,orderNumber",
+          "index": 0,
+          "mapFunctionName": "CONCAT(trackId,orderNumber)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "track_id",
+          "jsonKeyName": "trackId",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_group_id",
+          "jsonKeyName": "products=>options=>ahsGroupName,groupId",
+          "index": 3,
+          "mapFunctionName": "IF(products=>options=>ahsGroupName, 'Almosafer Call Centre', '5', IF(products=>options=>ahsGroupName, 'Almosafer VIP', '5', IF(products=>options=>ahsGroupName, 'Almosafer Branch', '5', IF(products=>options=>ahsGroupName, 'almosafer call centre', '5', IF(products=>options=>ahsGroupName, 'almosafer branch', '5', groupId)))))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_type",
+          "jsonKeyName": "type",
+          "index": 4,
+          "mapFunctionName": "INCLUDE_IF(type, 'hotel')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "product_type",
+          "jsonKeyName": "products=>type",
+          "index": 5,
+          "mapFunctionName": "INCLUDE_IF(products=>type, 'hotel;rule')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "office_id",
+          "jsonKeyName": "products=>additionalData=>searchAttributes=>officeId,additionalData=>officeId,additionalData=>headers=>x-site-id",
+          "index": 6,
+          "mapFunctionName": "COALESCE(COALESCE(IF(products=>additionalData=>searchAttributes=>officeId, \"\", \"null\",products=>additionalData=>searchAttributes=>officeId),IF(additionalData=>officeId, \"\", \"null\", additionalData=>officeId)), additionalData=>headers=>x-site-id)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_products_category_type",
+          "jsonKeyName": "products=>category",
+          "index": 7,
+          "mapFunctionName": "INCLUDE_IF(products=>category,'hotel;coupon;rule')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingdate_id",
+          "jsonKeyName": "createdAt,products=>createdAt",
+          "index": 8,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>createdAt,createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_booking_hour",
+          "jsonKeyName": "createdAt",
+          "index": 9,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>createdAt,createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"HH\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_booking_timestamp",
+          "jsonKeyName": "createdAt",
+          "index": 10,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>createdAt,createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"HH:mm:ss.S\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingupdated_id",
+          "jsonKeyName": "updatedAt,products=>updatedAt",
+          "index": 11,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>updatedAt,updatedAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd HH:mm:ss.S\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_firstcancellation_date",
+          "jsonKeyName": "products=>options=>supplierFirstCancellationDate",
+          "index": 12,
+          "mapFunctionName": "DATE_FORMAT(products=>options=>supplierFirstCancellationDate, \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\",'NONSTRICT')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_cancellation_date",
+          "jsonKeyName": "products=>additionalData=>cancelRequests",
+          "index": 13,
+          "mapFunctionName": "COALESCE(DATE_FORMAT(ARRAY_FIRST(products=>additionalData=>cancelRequests, 'createdAt=>$date'), \"EPOCH\",\"yyyyMMdd\"),DATE_FORMAT(ARRAY_FIRST(products=>additionalData=>cancelRequests, 'createdAt'), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd'T'hh:mm:ssZ\", \"yyyyMMdd\"))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingpaid_id",
+          "jsonKeyName": "paidAt,products=>statusHistory",
+          "index": 14,
+          "mapFunctionName": "DATE_FORMAT(IF(paidAt,'null',ARRAY_IF(products=>statusHistory,'status','78','createdAt','null'),paidAt), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd hh:mm:ss@#@yyyy-MM-dd'T'hh:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_hotel_id",
+          "jsonKeyName": "products=>options=>cityEn,products=>options=>hotelNameEn,products=>options=>hotelId,products=>options=>city",
+          "index": 15,
+          "mapFunctionName": "GENERATE_KEY(CONCAT(CLEAR_STRING(STR_REPLACE(STR_REPLACE(STR_REPLACE(STR_REPLACE(STR_REPLACE(STR_REPLACE(UPPER(products=>options=>hotelNameEn), 'THE ', ''), 'HOTEL', ''), 'OF', ''), ' A ', ''),CLEAR_STRING(UPPER(STR_SPLIT(COALESCE(IF(IS_ARABIC(products=>options=>city),'true',products=>options=>cityEn,products=>options=>city),'null'),\"comma\",\"0\"))),''),' ','')),UPPER(CLEAR_STRING(STR_REPLACE(STR_SPLIT(COALESCE(IF(IS_ARABIC(products=>options=>city),'true',products=>options=>cityEn,products=>options=>city),'null'),\"comma\",\"0\"),'null','')))))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_supplier_id",
+          "jsonKeyName": "products=>supplierName, products=>isManual",
+          "index": 16,
+          "mapFunctionName": "IF(products=>isManual, 'true', 'NA', products=>supplierName)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_vendor_id",
+          "jsonKeyName": "products=>vendorName",
+          "index": 17,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_supplier_currency",
+          "jsonKeyName": "products=>supplierPrice=>currency",
+          "index": 18,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_customer_id",
+          "jsonKeyName": "contact=>email",
+          "index": 19,
+          "mapFunctionName": "GENERATE_KEY(contact=>email)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_store_id",
+          "jsonKeyName": "products=>options=>ahsGroupName,storeId",
+          "index": 20,
+          "mapFunctionName": "IF(products=>options=>ahsGroupName, 'Almosafer Call Centre', '11000', IF(products=>options=>ahsGroupName, 'Almosafer VIP', '11002', IF(products=>options=>ahsGroupName, 'Almosafer Branch', '11001', IF(products=>options=>ahsGroupName, 'almosafer call centre', '11000', IF(products=>options=>ahsGroupName, 'almosafer branch', '11001', storeId)))))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_language_id",
+          "jsonKeyName": "additionalData=>headers=>x-locale",
+          "index": 21,
+          "mapFunctionName": "COALESCE(IF(additionalData=>headers=>x-locale,'','en',additionalData=>headers=>x-locale), 'en')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_checkin_date_id",
+          "jsonKeyName": "products=>options=>checkIn,products=>options=>checkInDate",
+          "index": 22,
+          "mapFunctionName": "COALESCE(DATE_FORMAT(products=>options=>checkInDate, \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\"), DATE_FORMAT(products=>options=>checkIn, \"dd-MM-yyyy@#@yyyy-MM-dd\", \"yyyyMMdd\"))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_checkout_date_id",
+          "jsonKeyName": "products=>options=>checkOut,products=>options=>checkOutDate",
+          "index": 23,
+          "mapFunctionName": "COALESCE(DATE_FORMAT(products=>options=>checkOutDate, \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\"), DATE_FORMAT(products=>options=>checkOut, \"dd-MM-yyyy@#@yyyy-MM-dd\", \"yyyyMMdd\"))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_total_currency",
+          "jsonKeyName": "totals=>totalCurrency",
+          "index": 24,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_request_currency_id",
+          "jsonKeyName": "products=>displayCurrency",
+          "index": 25,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_promo_id",
+          "jsonKeyName": "products=>name",
+          "index": 26,
+          "mapFunctionName": "IF(products=>type,'rule',products=>name,'null')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_status_id",
+          "jsonKeyName": "products=>status",
+          "index": 27,
+          "mapFunctionName": "COALESCE(STR_SPLIT(products=>status,\".\",\"0\"),products=>status)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_state_id",
+          "jsonKeyName": "additionalData=>state",
+          "index": 28,
+          "mapFunctionName": "IF(additionalData=>state, \"null\", \"In Progress\", IF(additionalData=>state, \"\", \"In Progress\", additionalData=>state))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingtype_id",
+          "jsonKeyName": "additionalData=>bookingMethod,payment=>paymentMethod",
+          "index": 29,
+          "mapFunctionName": "IF(additionalData=>bookingMethod, \"op\", \"Pay Later\", \"Pay Now\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_cancellation_policy",
+          "jsonKeyName": "products=>additionalData=>cancellationPolicies=>hasFreeCancellation",
+          "index": 30,
+          "mapFunctionName": "IF(products=>additionalData=>cancellationPolicies=>hasFreeCancellation, \"true\", \"Refundable\", \"Non-Refundable\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_ratetype",
+          "jsonKeyName": "payment=>type",
+          "index": 31,
+          "mapFunctionName": "IF(payment=>type, \"prepaid\", \"Net\", \"Gross\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_markup_currency",
+          "jsonKeyName": "products=>additionalData=>netPrice=>currency",
+          "index": 32,
+          "mapFunctionName": "COALESCE(IF(products=>additionalData=>netPrice=>currency, \"\", 'SAR',products=>additionalData=>netPrice=>currency), 'SAR')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_paymentstatus_id",
+          "jsonKeyName": "products=>paymentStatus",
+          "index": 33,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "is_manual",
+          "jsonKeyName": "products=>isManual,isManual",
+          "index": 34,
+          "mapFunctionName": "COALESCE(COALESCE(products=>isManual, isManual), 'false')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "ahs_group_name",
+          "jsonKeyName": "products=>options=>ahsGroupName",
+          "index": 35,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "sale_price_currency",
+          "jsonKeyName": "products=>price=>totalCurrency",
+          "index": 36,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "net_price_currency",
+          "jsonKeyName": "products=>additionalData=>netPrice=>currency",
+          "index": 37,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_type",
+          "jsonKeyName": "payment=>type",
+          "index": 38,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "visa_checkout_flag",
+          "jsonKeyName": "payment=>source",
+          "index": 39,
+          "mapFunctionName": "IF(payment=>source,'checkoutcom.visa.checkout','true','false')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "client_os",
+          "jsonKeyName": "additionalData=>headers=>user-agent",
+          "index": 40,
+          "mapFunctionName": "COALESCE(BROWSER_AGENT_STRING(additionalData=>headers=>user-agent,'OS'),'')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_hotel_id_source",
+          "jsonKeyName": "products=>options=>hotelId",
+          "index": 41,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "devicetype",
+          "jsonKeyName": "additionalData=>headers=>user-agent",
+          "index": 42,
+          "mapFunctionName": "COALESCE(BROWSER_AGENT_STRING(additionalData=>headers=>user-agent,'device'),'')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "xplatform",
+          "jsonKeyName": "additionalData=>headers=>x-platform",
+          "index": 43,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_method",
+          "jsonKeyName": "payment=>paymentMethod",
+          "index": 44,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "sale_price",
+          "jsonKeyName": "products=>price=>total,products=>price=>markup",
+          "index": 45,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(SUBTRACT(products=>price=>total,products=>price=>markup), -1)",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "net_price",
+          "jsonKeyName": "products=>additionalData=>netPrice=>price",
+          "index": 46,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>additionalData=>netPrice=>price, -1)",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "payment_amount",
+          "jsonKeyName": "totals=>total",
+          "index": 47,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(totals=>total, '0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "booking_value",
+          "jsonKeyName": "products=>price=>total",
+          "index": 48,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>total, '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "supplier_cost",
+          "jsonKeyName": "products=>supplierPrice=>base",
+          "index": 49,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>supplierPrice=>base, '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_aed",
+          "jsonKeyName": "products=>additionalData=>exchange=>equivalent",
+          "index": 50,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'AED', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.98', IF(totals=>totalCurrency, 'AED', '1', IF(totals=>totalCurrency, 'KWD', '12.10', IF(totals=>totalCurrency, 'BHD', '9.73', IF(totals=>totalCurrency, 'QAR', '1.0', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_usd",
+          "jsonKeyName": "products=>additionalData=>exchange=>equivalent",
+          "index": 51,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_sar",
+          "jsonKeyName": "products=>additionalData=>exchange=>equivalent",
+          "index": 52,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'SAR', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '1', IF(totals=>totalCurrency, 'AED', '1.02', IF(totals=>totalCurrency, 'KWD', '12.35', IF(totals=>totalCurrency, 'BHD', '9.94', IF(totals=>totalCurrency, 'QAR', '1.02', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_kwd",
+          "jsonKeyName": "products=>additionalData=>exchange=>equivalent",
+          "index": 53,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'KWD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.081', IF(totals=>totalCurrency, 'AED', '0.083', IF(totals=>totalCurrency, 'KWD', '1', IF(totals=>totalCurrency, 'BHD', '0.81', IF(totals=>totalCurrency, 'QAR', '0.083', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_qar",
+          "jsonKeyName": "products=>additionalData=>exchange=>equivalent",
+          "index": 54,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'QAR', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.98', IF(totals=>totalCurrency, 'AED', '1', IF(totals=>totalCurrency, 'KWD', '12.10', IF(totals=>totalCurrency, 'BHD', '9.75', IF(totals=>totalCurrency, 'QAR', '1.0', '0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_bhd",
+          "jsonKeyName": "products=>additionalData=>exchange=>equivalent",
+          "index": 55,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'BHD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.1', IF(totals=>totalCurrency, 'AED', '0.1', IF(totals=>totalCurrency, 'KWD', '1.24', IF(totals=>totalCurrency, 'BHD', '1', IF(totals=>totalCurrency, 'QAR', '0.1', '0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "room_count",
+          "jsonKeyName": "products=>options=>room,products=>additionalData=>searchAttributes=>room",
+          "index": 56,
+          "dataTypeName": "int",
+          "mapFunctionName": "IF(ARRAY_SIZE(products=>options=>room),'0',ARRAY_SIZE(products=>additionalData=>searchAttributes=>room),ARRAY_SIZE(products=>options=>room))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "length_of_stay",
+          "jsonKeyName": "products=>options=>numberOfNights",
+          "index": 57,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(products=>options=>numberOfNights, '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "booking_window",
+          "jsonKeyName": "createdAt,products=>options=>checkIn,products=>options=>checkInDate",
+          "index": 58,
+          "dataTypeName": "int",
+          "mapFunctionName": "IF_OPERATION(COALESCE(DATE_DIFF(createdAt, COALESCE(DATE_FORMAT(products=>options=>checkInDate, \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\"), DATE_FORMAT(products=>options=>checkIn, \"dd-MM-yyyy@#@yyyy-MM-dd\", \"yyyyMMdd\")), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\", \"DAYS\"), '0'),\"<\",\"0\",\"0\",COALESCE(DATE_DIFF(createdAt, COALESCE(DATE_FORMAT(products=>options=>checkInDate, \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\"), DATE_FORMAT(products=>options=>checkIn, \"dd-MM-yyyy@#@yyyy-MM-dd\", \"yyyyMMdd\")), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\", \"DAYS\"), '0')) ",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "pax_count",
+          "jsonKeyName": "products=>options=>numberOfGuests",
+          "index": 59,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(products=>options=>numberOfGuests, '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "discount_amount",
+          "jsonKeyName": "totals=>discount,products=>type,products=>category,products=>price=>total",
+          "index": 60,
+          "dataTypeName": "double",
+          "mapFunctionName": "IF(products=>type, 'rule',products=>price=>total,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "payment_amount_usd",
+          "jsonKeyName": "totals=>total,products=>additionalData=>exchange=>equivalent",
+          "index": 61,
+          "dataTypeName": "double",
+          "mapFunctionName": "MULTIPLY(IF(products=>type, 'hotel', totals=>total, '0.0'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0')))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "discount_amount_usd",
+          "jsonKeyName": "totals=>discount,products=>additionalData=>exchange=>equivalent",
+          "index": 62,
+          "dataTypeName": "double",
+          "mapFunctionName": "MULTIPLY(MULTIPLY(IF(products=>type, 'rule',IF(products=>category,'coupon', products=>price=>total, '0.0'),'0.0'), '-1'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0')))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "iov",
+          "jsonKeyName": "totals=>total,totals=>discount,products=>additionalData=>exchange=>equivalent",
+          "index": 63,
+          "dataTypeName": "double",
+          "mapFunctionName": "ADD(MULTIPLY(IF(products=>type, 'hotel', totals=>total, '0.0'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0'))))))), MULTIPLY(MULTIPLY(IF(products=>type, 'rule',IF(products=>category,'coupon', products=>price=>total, '0.0'),'0.0'), '-1'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0'))))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "gbv",
+          "jsonKeyName": "totals=>total",
+          "index": 64,
+          "dataTypeName": "double",
+          "mapFunctionName": "IF(IF(additionalData=>state, \"null\", \"In Progress\", addtionalData=>state), 'Fraud', '0.0', IF(products=>status,'94', '0.0', IF(products=>status,'91', '0.0',ADD(MULTIPLY(IF(products=>type, 'hotel', totals=>total, '0.0'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0'))))))), MULTIPLY(MULTIPLY(IF(products=>type, 'rule',IF(products=>category,'coupon', products=>price=>total, '0.0'),'0.0'), '-1'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0')))))))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "room_nights ",
+          "jsonKeyName": "groupId",
+          "index": 65,
+          "dataTypeName": "int",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "markup_total",
+          "jsonKeyName": "groupId",
+          "index": 66,
+          "dataTypeName": "double",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "markup_percentage",
+          "jsonKeyName": "groupId",
+          "index": 67,
+          "dataTypeName": "double",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "markup_final_amount",
+          "jsonKeyName": "groupId",
+          "index": 68,
+          "dataTypeName": "double",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "markup_final_currency",
+          "jsonKeyName": "groupId",
+          "index": 69,
+          "dataTypeName": "double",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "markup_final_amount_usd",
+          "jsonKeyName": "groupId",
+          "index": 70,
+          "dataTypeName": "double",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "inputvat",
+          "jsonKeyName": "products=>options=>inputVat",
+          "index": 71,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>options=>inputVat,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "outputvat",
+          "jsonKeyName": "products=>options=>outputVat",
+          "index": 72,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>options=>outputVat,'0.0')",
+          "keyValueFlag": "value"
+        }
+      ]
+    },
+    {
+"data_set_name": "fact_flight_orders",
+      "fields": [
+        {
+          "fieldName": "id",
+          "jsonKeyName": "trackId,orderNumber",
+          "index": 0,
+          "mapFunctionName": "CONCAT(trackId,orderNumber)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "track_id",
+          "jsonKeyName": "trackId",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_type",
+          "jsonKeyName": "type",
+          "index": 2,
+          "mapFunctionName": "INCLUDE_IF(type, 'flight')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "product_type",
+          "jsonKeyName": "products=>type",
+          "index": 3,
+          "mapFunctionName": "INCLUDE_IF(products=>type, 'flight;rule')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_group_id",
+          "jsonKeyName": "groupId",
+          "index": 4,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 5,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_product_category_type",
+          "jsonKeyName": "products=>category",
+          "index": 6,
+          "mapFunctionName": "INCLUDE_IF(products=>category,'flight;coupon;rule')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_office_id",
+          "jsonKeyName": "products=>additionalData=>officeId",
+          "index": 7,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingdate_id",
+          "jsonKeyName": "createdAt,products=>createdAt",
+          "index": 8,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>createdAt,createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_booking_hour",
+          "jsonKeyName": "createdAt",
+          "index": 9,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>createdAt,createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"HH\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_booking_timestamp",
+          "jsonKeyName": "createdAt",
+          "index": 10,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>createdAt,createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"HH:mm:ss.S\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_travel_date",
+          "jsonKeyName": "products=>options=>segment",
+          "index": 11,
+          "mapFunctionName": "COALESCE(DATE_FORMAT(ARRAY_FIRST(products=>options=>segment, 'departureDateTime=>$date'), \"EPOCH\", 'yyyyMMdd', 'NONSTRICT'), DATE_FORMAT(ARRAY_FIRST(products=>options=>segment, 'departure'), \"dd/MM/yyyy hh:mm@#@yyyy-MM-dd'T'hh:mm:ss\", 'yyyyMMdd', 'NONSTRICT'))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_arrival_date",
+          "jsonKeyName": "products=>options=>segment",
+          "index": 12,
+          "mapFunctionName": "COALESCE(DATE_FORMAT(ARRAY_LAST(products=>options=>segment, 'arrivalDateTime=>$date'), \"EPOCH\", 'yyyyMMdd', 'NONSTRICT'), DATE_FORMAT(ARRAY_FIRST(products=>options=>segment, 'arrival'), \"dd/MM/yyyy hh:mm@#@yyyy-MM-dd'T'hh:mm:ss\", 'yyyyMMdd', 'NONSTRICT'))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_travel_hour",
+          "jsonKeyName": "products=>options=>segment",
+          "index": 13,
+          "mapFunctionName": "COALESCE(DATE_FORMAT(ARRAY_FIRST(products=>options=>segment, 'departureDateTime=>$date'), \"EPOCH\", 'HH', 'NONSTRICT'), DATE_FORMAT(ARRAY_FIRST(products=>options=>segment, 'departure'), \"dd/MM/yyyy hh:mm@#@yyyy-MM-dd'T'hh:mm:ss\", 'HH', 'NONSTRICT'))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingupdated_id",
+          "jsonKeyName": "updatedAt,products=>updatedAt",
+          "index": 14,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>updatedAt,updatedAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd HH:mm:ss.S\",'NONSTRICT')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_firstcancellation_date",
+          "jsonKeyName": "products=>options=>supplierFirstCancellationDate",
+          "index": 15,
+          "mapFunctionName": "DATE_FORMAT(products=>options=>supplierFirstCancellationDate, \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_cancellation_date",
+          "jsonKeyName": "products=>additionalData=>cancelRequests",
+          "index": 16,
+          "mapFunctionName": "COALESCE(DATE_FORMAT(ARRAY_FIRST(products=>additionalData=>cancelRequests, 'createdAt=>$date'), \"EPOCH\",\"yyyyMMdd\"),DATE_FORMAT(ARRAY_FIRST(products=>additionalData=>cancelRequests, 'createdAt'), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd'T'hh:mm:ssZ\", \"yyyyMMdd\"))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingpaid_id",
+          "jsonKeyName": "paidAt,products=>statusHistory,createdAt",
+          "index": 17,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(IF(paidAt,'null',ARRAY_IF(products=>statusHistory,'status','78','createdAt','null'),paidAt), createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd hh:mm:ss@#@yyyy-MM-dd'T'hh:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_store_id",
+          "jsonKeyName": "storeId",
+          "index": 18,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_promo_id",
+          "jsonKeyName": "products=>name",
+          "index": 19,
+          "mapFunctionName": "IF(products=>type,'rule',products=>name,'null')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_customer_id",
+          "jsonKeyName": "contact=>email",
+          "index": 20,
+          "mapFunctionName": "GENERATE_KEY(contact=>email)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_vendor_id",
+          "jsonKeyName": "products=>vendorName",
+          "index": 21,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_language",
+          "jsonKeyName": "additionalData=>headers=>x-locale",
+          "index": 22,
+          "mapFunctionName": "COALESCE(COALESCE(ARRAY_FIRST(products=>additionalData=>state_history,'user_detail=>headers=>accept-language', 'NONSTRICT'),IF(additionalData=>headers=>x-locale,'','en',additionalData=>headers=>x-locale)),'en')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_origin",
+          "jsonKeyName": "products=>options=>leg",
+          "index": 23,
+          "mapFunctionName": "ARRAY_FIRST(products=>options=>leg, 'originId')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_destination",
+          "jsonKeyName": "products=>options=>leg",
+          "index": 24,
+          "mapFunctionName": "ARRAY_FIRST(products=>options=>leg, 'destinationId')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_flightcode_leg1",
+          "jsonKeyName": "products=>options=>leg",
+          "index": 25,
+          "mapFunctionName": "ARRAY_NTH(products=>options=>leg, '0', 'flightCode')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_airline_leg1",
+          "jsonKeyName": "products=>options=>leg",
+          "index": 26,
+          "mapFunctionName": "SUBSTR(ARRAY_NTH(products=>options=>leg, '0', 'flightCode'), '0', '2')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_flightcode_leg2",
+          "jsonKeyName": "products=>options=>leg",
+          "index": 27,
+          "mapFunctionName": "ARRAY_NTH(products=>options=>leg, '1', 'flightCode')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_airlinecode_leg2",
+          "jsonKeyName": "products=>options=>leg",
+          "index": 28,
+          "mapFunctionName": "SUBSTR(ARRAY_NTH(products=>options=>leg, '1', 'flightCode'), '0', '2')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_trip_type",
+          "jsonKeyName": "products=>additionalData=>searchType",
+          "index": 29,
+          "mapFunctionName": "LOWER(products=>additionalData=>searchType)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_journey_type",
+          "jsonKeyName": "products=>additionalData=>isDomestic,products=>options=>additionalData=>isDomestic",
+          "index": 30,
+          "mapFunctionName": "IF(COALESCE(products=>additionalData=>isDomestic, products=>options=>additionalData=>isDomestic), 'true', 'DOM', 'INT')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_totals_currency",
+          "jsonKeyName": "totals=>totalCurrency",
+          "index": 31,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_status_id",
+          "jsonKeyName": "products=>status",
+          "index": 32,
+          "mapFunctionName": "COALESCE(STR_SPLIT(products=>status,\".\",\"0\"),products=>status)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_paymentstatus_id",
+          "jsonKeyName": "products=>paymentStatus",
+          "index": 33,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_state_id",
+          "jsonKeyName": "additionalData=>state",
+          "index": 34,
+          "mapFunctionName": "IF(additionalData=>state, \"null\", \"In Progress\", additionalData=>state)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingtype_id",
+          "jsonKeyName": "additionalData=>bookingMethod,payment=>paymentMethod",
+          "index": 35,
+          "mapFunctionName": "IF(additionalData=>bookingMethod, \"op\", \"Pay Later\", \"Pay Now\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "is_manual",
+          "jsonKeyName": "products=>isManual,isManual",
+          "index": 36,
+          "mapFunctionName": "COALESCE(COALESCE(products=>isManual, isManual), 'false')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "carrier_type",
+          "jsonKeyName": "products=>vendorName",
+          "index": 37,
+          "mapFunctionName": "IF(products=>vendorName, 'tf', 'low cost', 'full service')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_type",
+          "jsonKeyName": "payment=>type",
+          "index": 38,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "visa_checkout_flag",
+          "jsonKeyName": "payment=>source",
+          "index": 39,
+          "mapFunctionName": "IF(payment=>source,'checkoutcom.visa.checkout','true','false')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "client_os",
+          "jsonKeyName": "additionalData=>headers=>user-agent",
+          "index": 40,
+          "mapFunctionName": "COALESCE(BROWSER_AGENT_STRING(additionalData=>headers=>user-agent,'OS'),'')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cabin_class",
+          "jsonKeyName": "products=>options=>fare=>legDetails",
+          "index": 41,
+          "mapFunctionName": "COALESCE(ARRAY_FIRST(products=>options=>fare=>legDetails,'segment=>cabinText'),' ')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "deal_amount",
+          "jsonKeyName": " products=>additionalData=>dealAmount",
+          "index": 42,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(CLEAR_NUMBERSTRING(products=>additionalData=>dealAmount),'0.0')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "loss_amount",
+          "jsonKeyName": " products=>additionalData=>losses",
+          "index": 43,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(CLEAR_NUMBERSTRING(products=>additionalData=>losses),'0.0')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "devicetype",
+          "jsonKeyName": "additionalData=>headers=>user-agent",
+          "index": 44,
+          "mapFunctionName": "COALESCE(BROWSER_AGENT_STRING(additionalData=>headers=>user-agent,'device'),'')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "xplatform",
+          "jsonKeyName": "additionalData=>headers=>x-platform",
+          "index": 45,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "RBD",
+          "jsonKeyName": "products=>options=>fare=>legDetails",
+          "index": 46,
+          "mapFunctionName": "COALESCE(ARRAY_FIRST(products=>options=>fare=>legDetails,'segment=>classOfLeg'),' ')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_method",
+          "jsonKeyName": "payment=>paymentMethod",
+          "index": 47,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "conversion_rate_aed",
+          "jsonKeyName": "products=>additionalData=>exchange=>Equivalent",
+          "index": 48,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(products=>additionalData=>exchange=>equivalent, 'code', 'AED', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.98', IF(totals=>totalCurrency, 'AED', '1', IF(totals=>totalCurrency, 'KWD', '12.10', IF(totals=>totalCurrency, 'BHD', '9.73', IF(totals=>totalCurrency, 'QAR', '1.0', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_usd",
+          "jsonKeyName": "products=>additionalData=>exchange=>Equivalent",
+          "index": 49,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(products=>additionalData=>exchange=>Equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "payment_amount",
+          "jsonKeyName": "totals=>total",
+          "index": 50,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(totals=>total, '0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "adult_count",
+          "jsonKeyName": "products=>options=>pax",
+          "index": 51,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(ARRAY_SUM_IF(products=>options=>pax, 'info=>type', 'ADT', '1'), '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "children_count",
+          "jsonKeyName": "products=>options=>pax",
+          "index": 52,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(ARRAY_SUM_IF(products=>options=>pax, 'info=>type', 'CH', '1'), '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "infants_count",
+          "jsonKeyName": "products=>options=>pax",
+          "index": 53,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(ARRAY_SUM_IF(products=>options=>pax, 'info=>type', 'INF', '1'), '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "no_of_passengers",
+          "jsonKeyName": "products=>options=>pax",
+          "index": 54,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(ARRAY_SIZE(products=>options=>pax), '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "total_seat",
+          "jsonKeyName": "products=>traveller",
+          "index": 55,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(ARRAY_COUNT_DISTINCT(products=>traveller, 'additionalData=>seatIndex', 'NONSTRICT'), '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "no_of_legs",
+          "jsonKeyName": "products=>options=>leg",
+          "index": 56,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(ARRAY_SIZE(products=>options=>leg), '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "no_of_segments",
+          "jsonKeyName": "products=>options=>segment",
+          "index": 57,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(ARRAY_SIZE(products=>options=>segment), '0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "discount_amount",
+          "jsonKeyName": "totals=>discount,products=>type,products=>category,products=>price=>total",
+          "index": 58,
+          "dataTypeName": "double",
+          "mapFunctionName": "IF(products=>type, 'rule',  products=>price=>total, '0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "booking_window",
+          "jsonKeyName": "createdAt,products=>options=>leg",
+          "index": 59,
+          "dataTypeName": "int",
+          "mapFunctionName": "IF_OPERATION(COALESCE(DATE_DIFF(createdAt, COALESCE(DATE_FORMAT(ARRAY_FIRST(products=>options=>leg, 'departureDateTime=>$date'), \"EPOCH\", 'yyyyMMdd', 'NONSTRICT'), DATE_FORMAT(ARRAY_FIRST(products=>options=>leg, 'departure'), \"dd/MM/yyyy hh:mm@#@yyyy-MM-dd'T'hh:mm:ss\", 'yyyyMMdd', 'NONSTRICT')), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\", \"DAYS\"), '0'),\"<\",\"0\",\"0\",COALESCE(DATE_DIFF(createdAt, COALESCE(DATE_FORMAT(ARRAY_FIRST(products=>options=>leg, 'departureDateTime=>$date'), \"EPOCH\", 'yyyyMMdd', 'NONSTRICT'), DATE_FORMAT(ARRAY_FIRST(products=>options=>leg, 'departure'), \"dd/MM/yyyy hh:mm@#@yyyy-MM-dd'T'hh:mm:ss\", 'yyyyMMdd', 'NONSTRICT')), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\", \"DAYS\"), '0'))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "payment_amount_usd",
+          "jsonKeyName": "totals=>total",
+          "index": 60,
+          "dataTypeName": "double",
+          "mapFunctionName": "MULTIPLY(IF(products=>type, 'flight', totals=>total, '0.0'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>Equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0')))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "discount_amount_usd",
+          "jsonKeyName": "totals=>total",
+          "index": 61,
+          "dataTypeName": "double",
+          "mapFunctionName": "MULTIPLY(MULTIPLY(IF(products=>type, 'rule', IF(products=>category, 'coupon', products=>price=>total, '0.0'), '0.0'), '-1'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>Equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0')))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "iov",
+          "jsonKeyName": "totals=>total",
+          "index": 62,
+          "dataTypeName": "double",
+          "mapFunctionName": "ADD(MULTIPLY(IF(products=>type, 'flight', totals=>total, '0.0'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>Equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0'))))))), MULTIPLY(MULTIPLY(IF(products=>type, 'rule', IF(products=>category, 'coupon', products=>price=>total, '0.0'), '0.0'), '-1'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>Equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0'))))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "gbv",
+          "jsonKeyName": "totals=>total",
+          "index": 63,
+          "dataTypeName": "double",
+          "mapFunctionName": "IF(IF(additionalData=>state, \"null\", \"In Progress\", additionalData=>state), 'Fraud', '0.0', IF(products=>status,'94', '0.0',  IF(products=>status,'91', '0.0', ADD(MULTIPLY(IF(products=>type, 'flight', totals=>total, '0.0'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>Equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0'))))))), MULTIPLY(MULTIPLY(IF(products=>type, 'rule', IF(products=>category, 'coupon', products=>price=>total, '0.0'), '0.0'), '-1'), COALESCE(ARRAY_IF(products=>additionalData=>exchange=>Equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '3.75', IF(totals=>totalCurrency, 'AED', '3.65', IF(totals=>totalCurrency, 'KWD', '0.34', IF(totals=>totalCurrency, 'BHD', '0.37', IF(totals=>totalCurrency, 'QAR', '3.64', '0.0')))))))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "length_of_trip",
+          "jsonKeyName": "groupId",
+          "index": 64,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "tax",
+          "jsonKeyName": "products=>price=>tax",
+          "index": 65,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>tax,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "base_amount",
+          "jsonKeyName": "products=>price=>base",
+          "index": 66,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>base,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "inputvat",
+          "jsonKeyName": "products=>options=>inputVat",
+          "index": 67,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>options=>inputVat,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "outputvat",
+          "jsonKeyName": "products=>options=>outputVat",
+          "index": 68,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>options=>outputVat,'0.0')",
+          "keyValueFlag": "value"
+        }
+      ]
+    },
+    {
+      "data_set_name": "dim_hotel_raw",
+      "fields": [
+        {
+          "fieldName": "dim_hotel_id",
+          "jsonKeyName": "products=>options=>cityEn,products=>options=>hotelNameEn",
+          "index": 0,
+          "mapFunctionName": "GENERATE_KEY(CONCAT(CLEAR_STRING(STR_REPLACE(STR_REPLACE(STR_REPLACE(STR_REPLACE(STR_REPLACE(STR_REPLACE(UPPER(products=>options=>hotelNameEn), 'THE ', ''), 'HOTEL', ''), 'OF', ''), ' A ', ''),CLEAR_STRING(UPPER(STR_SPLIT(COALESCE(IF(IS_ARABIC(products=>options=>city),'true',products=>options=>cityEn,products=>options=>city),'null'),\"comma\",\"0\"))),''),' ','')),UPPER(CLEAR_STRING(STR_REPLACE(STR_SPLIT(COALESCE(IF(IS_ARABIC(products=>options=>city),'true',products=>options=>cityEn,products=>options=>city),'null'),\"comma\",\"0\"),'null','')))))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "name",
+          "jsonKeyName": "products=>options=>hotelNameEn",
+          "index": 1,
+          "mapFunctionName": "STR_REPLACE(products=>options=>hotelNameEn,'\\n',' ')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "address",
+          "jsonKeyName": "products=>options=>addressEn",
+          "index": 2,
+          "mapFunctionName": "STR_REPLACE(products=>options=>addressEn,'\\n',' ')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "city",
+          "jsonKeyName": "products=>options=>city",
+          "index": 3,
+          "mapFunctionName": "CLEAR_STRING(COALESCE(IF(IS_ARABIC(products=>options=>city),'true',products=>options=>cityEn,products=>options=>city),'null'))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "district",
+          "jsonKeyName": "products=>options=>district",
+          "index": 4,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "country_code",
+          "jsonKeyName": "products=>options=>countryCode",
+          "index": 5,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "star_rating",
+          "jsonKeyName": "products=>options=>starRating",
+          "index": 6,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "longitude",
+          "jsonKeyName": "products=>options=>geoLocation=>Longitude",
+          "index": 7,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "latitude",
+          "jsonKeyName": "products=>options=>geoLocation=>Latitude",
+          "index": 8,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "zipcode",
+          "jsonKeyName": "products=>options=>zipCode",
+          "index": 9,
+          "keyValueFlag": "value"
+        }
+      ]
+    },
+    {
+      "data_set_name": "dim_customer_raw",
+      "fields": [
+        {
+          "fieldName": "dim_customer_id",
+          "jsonKeyName": "contact=>email",
+          "index": 0,
+          "mapFunctionName": "GENERATE_KEY(contact=>email)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "email",
+          "jsonKeyName": "contact=>email",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "firstname",
+          "jsonKeyName": "contact=>firstName",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "lastname",
+          "jsonKeyName": "contact=>lastName",
+          "index": 3,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "phone",
+          "jsonKeyName": "contact=>phone",
+          "index": 4,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "title",
+          "jsonKeyName": "contact=>title",
+          "index": 5,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "country",
+          "jsonKeyName": "contact=>countryId",
+          "index": 6,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "first_order_date",
+          "jsonKeyName": "createdAt",
+          "index": 7,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "first_order_group",
+          "jsonKeyName": "groupId",
+          "index": 8,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "first_product",
+          "jsonKeyName": "type",
+          "index": 9,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "first_store_id",
+          "jsonKeyName": "storeId",
+          "index": 10,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "first_order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 11,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "status",
+          "jsonKeyName": "products=>status",
+          "index": 12,
+          "mapFunctionName": "COALESCE(STR_SPLIT(products=>status,\".\",\"0\"),products=>status)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "first_promo_id",
+          "jsonKeyName": "products=>name",
+          "index": 13,
+          "mapFunctionName": "IF(products=>type,'rule',products=>name,'null')",
+          "keyValueFlag": "key"
+        }
+      ]
+    },
+    {
+      "data_set_name": "dim_room",
+      "fields": [
+        {
+          "fieldName": "room_id",
+          "jsonKeyName": "products=>options=>room=>Id",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "name",
+          "jsonKeyName": "products=>options=>room=>roomNameEn",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "room_class",
+          "jsonKeyName": "products=>options=>room=>RoomClass",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "room_type",
+          "jsonKeyName": "products=>options=>room=>RoomType",
+          "index": 3,
+          "keyValueFlag": "key"
+        }
+      ]
+    },
+    {
+      "data_set_name": "fact_status_history",
+      "fields": [
+        {
+          "fieldName": "order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_group_id",
+          "jsonKeyName": "groupId",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_type",
+          "jsonKeyName": "type",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingdate_id",
+          "jsonKeyName": "createdAt",
+          "index": 3,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>createdAt,createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_store_id",
+          "jsonKeyName": "storeId",
+          "index": 4,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "history_status_id",
+          "jsonKeyName": "products=>statusHistory=>status",
+          "index": 5,
+          "mapFunctionName": "COALESCE(products=>statusHistory=>status,\"0\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "history_text",
+          "jsonKeyName": "products=>statusHistory=>text",
+          "index": 6,
+          "mapFunctionName": "COALESCE(products=>statusHistory=>text,\"\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "history_type",
+          "jsonKeyName": "products=>statusHistory=>type",
+          "index": 7,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "history_created_date",
+          "jsonKeyName": "products=>statusHistory=>createdAt",
+          "index": 8,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>statusHistory=>createdAt,createdAt), \"yyyy-MM-dd HH:mm:ss@#@EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "history_created_timestamp",
+          "jsonKeyName": "products=>statusHistory=>createdAt",
+          "index": 9,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>statusHistory=>createdAt,createdAt), \"yyyy-MM-dd HH:mm:ss@#@EEE MMM dd HH:mm:ss zzz yyyy\", \"HH:mm:ss.S\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "history_updated_date",
+          "jsonKeyName": "products=>statusHistory=>updatedAt",
+          "index": 10,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>statusHistory=>updatedAt,createdAt), \"yyyy-MM-dd HH:mm:ss@#@EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "history_updated_timestamp",
+          "jsonKeyName": "products=>statusHistory=>updatedAt",
+          "index": 11,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>statusHistory=>updatedAt,createdAt), \"yyyy-MM-dd HH:mm:ss@#@EEE MMM dd HH:mm:ss zzz yyyy\", \"HH:mm:ss.S\")",
+          "keyValueFlag": "key"
+        }
+      ]
+    },
+    {
+      "data_set_name": "dim_supplier_raw",
+      "fields": [
+        {
+          "fieldName": "dim_supplier_id",
+          "jsonKeyName": "products=>isManual,products=>supplierName",
+          "index": 0,
+          "mapFunctionName": "IF(products=>isManual, 'true', 'NA', products=>supplierName)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "supplier_currency",
+          "jsonKeyName": "products=>supplierPrice=>currency",
+          "index": 1,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "vendor_name",
+          "jsonKeyName": "products=>vendorName",
+          "index": 2,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "vendor_currency",
+          "jsonKeyName": "products=>vendorPrice=>currency",
+          "index": 3,
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "vendor_id",
+          "jsonKeyName": "products=>additionalData=>headers=>x-ev-vendorid,additionalData=>headers=>x-ev-vendorid",
+          "index": 4,
+          "mapFunctionName": "COALESCE(products=>additionalData=>headers=>x-ev-vendorid,additionalData=>headers=>x-ev-vendorid)",
+          "keyValueFlag": "value"
+        }
+      ]
+    },
+    {
+ "data_set_name": "fact_package_orders",
+      "fields": [
+        {
+          "fieldName": "id",
+          "jsonKeyName": "trackId,orderNumber",
+          "index": 0,
+          "mapFunctionName": "CONCAT(trackId,orderNumber)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "trackId",
+          "jsonKeyName": "trackId",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_group_id",
+          "jsonKeyName": "groupId",
+          "index": 3,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_type",
+          "jsonKeyName": "type",
+          "index": 4,
+          "mapFunctionName": "INCLUDE_IF(type, 'package')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "products_type",
+          "jsonKeyName": "products=>type",
+          "index": 5,
+          "mapFunctionName": "INCLUDE_IF(products=>type, 'package;rule')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingdate_id",
+          "jsonKeyName": "createdAt",
+          "index": 6,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(createdAt,products=>createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingupdated_id",
+          "jsonKeyName": "updatedAt",
+          "index": 7,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(updatedAt,products=>updatedAt), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingpaid_id",
+          "jsonKeyName": "paidAt",
+          "index": 8,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(paidAt,products=>paidAt), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_supplier_id",
+          "jsonKeyName": "products=>supplierName, products=>isManual",
+          "index": 9,
+          "mapFunctionName": "COALESCE(IF(products=>supplierName,'','ATG',products=>supplierName),'ATG')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_supplier_currecny",
+          "jsonKeyName": "products=>supplierPrice=>currency",
+          "index": 10,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_customer_id",
+          "jsonKeyName": "contact=>email",
+          "index": 11,
+          "mapFunctionName": "GENERATE_KEY(contact=>email)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_store_id",
+          "jsonKeyName": "storeId",
+          "index": 12,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_language_id",
+          "jsonKeyName": "additionalData=>headers=>x-locale",
+          "index": 13,
+          "mapFunctionName": "COALESCE(IF(additionalData=>headers=>x-locale,'','en',additionalData=>headers=>x-locale), 'en')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_promo_id",
+          "jsonKeyName": "products=>name",
+          "index": 14,
+          "mapFunctionName": "IF(products=>type,'rule',products=>name,'null')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_checkin_date_id",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>checkinDate",
+          "index": 15,
+          "mapFunctionName": "DATE_FORMAT(products=>additionalData=>packageInfo=>checkinDate, \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_checkout_date_id",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>checkoutDate",
+          "index": 16,
+          "mapFunctionName": "DATE_FORMAT(products=>additionalData=>packageInfo=>checkoutDate, \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_validFrom_date_id",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>validFrom",
+          "index": 17,
+          "mapFunctionName": "DATE_FORMAT(products=>additionalData=>packageInfo=>validFrom, \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_validTo_date_id",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>validTo",
+          "index": 18,
+          "mapFunctionName": "DATE_FORMAT(products=>additionalData=>packageInfo=>validTo, \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_status_id",
+          "jsonKeyName": "products=>status",
+          "index": 19,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_payment_status_id",
+          "jsonKeyName": "products=>paymentStatus",
+          "index": 20,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingtype_id",
+          "jsonKeyName": "additionalData=>bookingMethod,payment=>paymentMethod",
+          "index": 21,
+          "mapFunctionName": "IF(payment=>paymentMethod, \"checkoutcom\", \"Pay Now\", IF(payment=>paymentMethod, \"payfort\", \"Pay Now\", \"Pay Later\"))",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_type",
+          "jsonKeyName": "payment=>type",
+          "index": 22,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "client_os",
+          "jsonKeyName": "additionalData=>headers=>user-agent",
+          "index": 23,
+          "mapFunctionName": "COALESCE(BROWSER_AGENT_STRING(additionalData=>headers=>user-agent,'OS'),'')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "sale_price_currency",
+          "jsonKeyName": "products=>price=>currency",
+          "index": 24,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "package_name",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>name",
+          "index": 25,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "destination",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>destinationAirport",
+          "index": 26,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "isActive",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>isActive",
+          "index": 27,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "sku",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>sku",
+          "index": 28,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "package_code",
+          "jsonKeyName": "products=>code",
+          "index": 29,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "masterCode",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>masterCode",
+          "index": 30,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_method",
+          "jsonKeyName": "payment=>paymentMethod",
+          "index": 31,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "quantity",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>qty",
+          "index": 32,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>additionalData=>packageInfo=>qty,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "net_price_currency",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>netCost",
+          "index": 33,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>additionalData=>packageInfo=>netCost,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "duration",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>duration",
+          "index": 34,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>additionalData=>packageInfo=>duration,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "profit",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>profit",
+          "index": 35,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>additionalData=>packageInfo=>profit,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "totalSalesPrice",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>totalSalesPrice",
+          "index": 36,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>additionalData=>packageInfo=>totalSalesPrice,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "markupPercentage",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>markupPercentage",
+          "index": 37,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>additionalData=>packageInfo=>markupPercentage,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "discountPercentage",
+          "jsonKeyName": "products=>additionalData=>packageInfo=>discountPercentage",
+          "index": 38,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>additionalData=>packageInfo=>discountPercentage,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "pax_count",
+          "jsonKeyName": "products=>options=>paxCount=>adult,products=>options=>paxCount=>child,products=>options=>paxCount=>infant",
+          "index": 39,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ADD(ADD(products=>options=>paxCount=>adult,products=>options=>paxCount=>child),products=>options=>paxCount=>infant),'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "payment_amount",
+          "jsonKeyName": "totals=>total",
+          "index": 40,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(totals=>total,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "supplier_cost",
+          "jsonKeyName": "products=>supplierPrice=>base",
+          "index": 41,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>supplierPrice=>base,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "sale_price_base",
+          "jsonKeyName": "products=>price=>base",
+          "index": 42,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>base,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "sale_price_total",
+          "jsonKeyName": "products=>price=>total",
+          "index": 43,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>total,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "payment_amount_usd",
+          "jsonKeyName": "totals=>total,additionalData=>exchange,totals=>totalCurrency",
+          "index": 44,
+          "dataTypeName": "double",
+          "mapFunctionName": "MULTIPLY(IF(products=>type, 'package', totals=>total, '0.0'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0')))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "discount_amount",
+          "jsonKeyName": "totals=>discount,products=>type,products=>category,products=>price=>total",
+          "index": 45,
+          "dataTypeName": "double",
+          "mapFunctionName": "IF(products=>type, 'rule',products=>price=>total,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "discount_amount_usd",
+          "jsonKeyName": "totals=>discount",
+          "index": 46,
+          "dataTypeName": "double",
+          "mapFunctionName": "MULTIPLY(MULTIPLY(IF(products=>type, 'rule',IF(products=>category,'coupon', products=>price=>total, '0.0'),'0.0'), '-1'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'),IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0')))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "iov",
+          "jsonKeyName": "totals=>total",
+          "index": 47,
+          "dataTypeName": "double",
+          "mapFunctionName": "ADD(MULTIPLY(IF(products=>type, 'package', totals=>total, '0.0'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0'))))))), MULTIPLY(MULTIPLY(IF(products=>type, 'rule', IF(products=>category, 'coupon', products=>price=>total, '0.0'), '0.0'), '-1'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0'))))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "gbv",
+          "jsonKeyName": "totals=>total,additionalData=>state,products=>status,status",
+          "index": 48,
+          "dataTypeName": "double",
+          "mapFunctionName": "IF(IF(additionalData=>state, \\\"null\\\", \\\"In Progress\\\", additionalData=>state), 'Fraud', '0.0', IF(status,'94', '0.0',  IF(products=>status,'91', '0.0', ADD(MULTIPLY(IF(products=>type, 'package', totals=>total, '0.0'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0'))))))), MULTIPLY(MULTIPLY(IF(products=>type, 'rule', IF(products=>category, 'coupon', products=>price=>total, '0.0'), '0.0'), '-1'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0')))))))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_aed",
+          "jsonKeyName": "additionalData=>exchange",
+          "index": 49,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'AED', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.98', IF(totals=>totalCurrency, 'AED', '1', IF(totals=>totalCurrency, 'KWD', '12.10', IF(totals=>totalCurrency, 'BHD', '9.73', IF(totals=>totalCurrency, 'QAR', '1.0', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_usd",
+          "jsonKeyName": "additionalData=>exchange",
+          "index": 50,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(totals=>totalCurrency, 'AED', '0.2739', IF(totals=>totalCurrency, 'KWD', '3.28', IF(totals=>totalCurrency, 'BHD', '2.702', IF(totals=>totalCurrency, 'QAR', '0.2747', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "totals_currency",
+          "jsonKeyName": "totals=>totalCurrency",
+          "index": 51,
+          "mapFunctionName": "COALESCE(totals=>totalCurrency,'')",
+          "keyValueFlag": "value"
+        }
+      ]
+    },
+    {
+"data_set_name": "fact_package_flight",
+      "fields": [
+        {
+          "fieldName": "id",
+          "jsonKeyName": "trackId,orderNumber",
+          "index": 0,
+          "mapFunctionName": "CONCAT(trackId,orderNumber)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_type",
+          "jsonKeyName": "products=>type,type",
+          "index": 2,
+          "mapFunctionName": "INCLUDE_IF(type, 'package')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "category",
+          "jsonKeyName": "products=>category",
+          "index": 3,
+          "mapFunctionName": "INCLUDE_IF(products=>type, 'flight;rule')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_group_id",
+          "jsonKeyName": "groupId",
+          "index": 4,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "airline_name",
+          "jsonKeyName": "products=>name",
+          "index": 5,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "status",
+          "jsonKeyName": "products=>status",
+          "index": 6,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "supplier_status",
+          "jsonKeyName": "products=>supplierStatus",
+          "index": 7,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "valid",
+          "jsonKeyName": "products=>valid",
+          "index": 8,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "code",
+          "jsonKeyName": "products=>code",
+          "index": 9,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "added_by",
+          "jsonKeyName": "products=>addedBy",
+          "index": 10,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_supplier_id",
+          "jsonKeyName": "products=>supplierName, products=>isManual",
+          "index": 11,
+          "mapFunctionName": "COALESCE(IF(products=>supplierName,'','ATG',products=>supplierName),'ATG')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_customer_id",
+          "jsonKeyName": "contact=>email",
+          "index": 12,
+          "mapFunctionName": "GENERATE_KEY(contact=>email)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_promo_id",
+          "jsonKeyName": "products=>name",
+          "index": 13,
+          "mapFunctionName": "IF(products=>type,'rule',products=>name,'null')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingdate_id",
+          "jsonKeyName": "products=>createdAt",
+          "index": 14,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(createdAt,products=>createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingupdated_id",
+          "jsonKeyName": "products=>updatedAt",
+          "index": 15,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(updatedAt,products=>updatedAt), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cabin_class",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>airline=>class",
+          "index": 16,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "flight_number",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>leg",
+          "index": 17,
+          "mapFunctionName": "COALESCE(ARRAY_FIRST(products=>additionalData=>flightInfo=>leg,'segment=>flightNumber'),' ')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "airline_code",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>airline=>airlineCode",
+          "index": 18,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "origin_city",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>leg",
+          "index": 19,
+          "mapFunctionName": "COALESCE(ARRAY_FIRST(products=>additionalData=>flightInfo=>leg,'segment=>origin=>city'),' ')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "destination_city",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>leg",
+          "index": 20,
+          "mapFunctionName": "COALESCE(ARRAY_FIRST(products=>additionalData=>flightInfo=>leg,'segment=>destination=>city'),' ')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "origin_country",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>leg",
+          "index": 21,
+          "mapFunctionName": "COALESCE(ARRAY_FIRST(products=>additionalData=>flightInfo=>leg,'segment=>origin=>country'),' ')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "destination_country",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>leg",
+          "index": 22,
+          "mapFunctionName": "COALESCE(ARRAY_FIRST(products=>additionalData=>flightInfo=>leg,'segment=>destination=>country'),' ')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_departure_time_id",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>leg",
+          "index": 23,
+          "mapFunctionName": "DATE_FORMAT(ARRAY_FIRST(products=>additionalData=>flightInfo=>leg,'segment=>departure'), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss tt@#@HH:mm\", \"HH:mm\",'NONSTRICT')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_arrival_time_id",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>leg",
+          "index": 24,
+          "mapFunctionName": "DATE_FORMAT(ARRAY_FIRST(products=>additionalData=>flightInfo=>leg,'segment=>arrival'), \"EEE MMM dd HH:mm:ss zzz yyyy@#@yyyy-MM-dd HH:mm:ss tt@#@HH:mm\", \"HH:mm\",'NONSTRICT')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "supplier_currency",
+          "jsonKeyName": "products=>supplierPrice=>currency",
+          "index": 25,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_status",
+          "jsonKeyName": "products=>paymentStatus",
+          "index": 26,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "sale_price_currency",
+          "jsonKeyName": "products=>price=>currency",
+          "index": 27,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "payment_method",
+          "jsonKeyName": "payment=>paymentMethod",
+          "index": 28,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "qty",
+          "jsonKeyName": "products=>qty",
+          "index": 29,
+          "dataTypeName": "int ",
+          "mapFunctionName": "COALESCE(products=>qty,'0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "flight_duration",
+          "jsonKeyName": "products=>additionalData=>flightInfo=>leg",
+          "index": 30,
+          "mapFunctionName": "COALESCE(ARRAY_FIRST(products=>additionalData=>flightInfo=>leg,'segment=>duration'),'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "stops_number",
+          "jsonKeyName": "products=>addistionalData=>cabinFlightInfo=>stop=>stopsNumber",
+          "index": 31,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>addistionalData=>cabinFlightInfo=>stop=>stopsNumber,0.0)",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "sale_price_total",
+          "jsonKeyName": "products=>price=>total",
+          "index": 32,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>total,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "sale_price_base",
+          "jsonKeyName": "products=>price=>base",
+          "index": 33,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>base,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "discount",
+          "jsonKeyName": "products=>price=>discount",
+          "index": 34,
+          "dataTypeName": "double",
+          "mapFunctionName": "IF(products=>type, 'rule',products=>price=>total,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "tax",
+          "jsonKeyName": "products=>price=>tax",
+          "index": 35,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>tax,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "supplier_price_total",
+          "jsonKeyName": "products=>supplierPrice=>total",
+          "index": 36,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>supplierPrice=>total,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "supplier_price_base",
+          "jsonKeyName": "products=>supplierPrice=>base",
+          "index": 37,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>supplierPrice=>base,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "pax_count",
+          "jsonKeyName": "products=>options=>adult,products=>options=>child,products=>options=>infant",
+          "index": 38,
+          "dataTypeName": "int",
+          "mapFunctionName": "COALESCE(ADD(ADD(products=>options=>adult,products=>options=>child),products=>options=>infant),'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "payment_amount_usd",
+          "jsonKeyName": "totals=>total,additionalData=>exchange,totals=>totalCurrency",
+          "index": 39,
+          "dataTypeName": "double",
+          "mapFunctionName": "MULTIPLY(IF(products=>type, 'flight',products=>price=>total, '0.0'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(products=>price=>currency, 'SAR', '0.2667', IF(products=>price=>currency, 'AED', '0.2739', IF(products=>price=>currency, 'KWD', '3.28', IF(products=>price=>currency, 'BHD', '2.702', IF(products=>price=>currency, 'QAR', '0.2747', '0.0')))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "iov",
+          "jsonKeyName": "products=>price=>total",
+          "index": 40,
+          "dataTypeName": "double",
+          "mapFunctionName": "ADD(MULTIPLY(IF(products=>type, 'flight',products=>price=>total, '0.0'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(products=>price=>currency, 'SAR', '0.2667', IF(products=>price=>currency, 'AED', '0.2739', IF(products=>price=>currency, 'KWD', '3.28', IF(products=>price=>currency, 'BHD', '2.702', IF(products=>price=>currency, 'QAR', '0.2747', '0.0'))))))), MULTIPLY(MULTIPLY(IF(products=>type, 'rule', IF(products=>category, 'coupon', products=>price=>total, '0.0'), '0.0'), '-1'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(products=>price=>currency, 'SAR', '0.2667', IF(products=>price=>currency, 'AED', '0.2739', IF(products=>price=>currency, 'KWD', '3.28', IF(products=>price=>currency, 'BHD', '2.702', IF(products=>price=>currency, 'QAR', '0.2747', '0.0'))))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "gbv",
+          "jsonKeyName": "products=>price=>total,additionalData=>state,status",
+          "index": 41,
+          "dataTypeName": "double",
+          "mapFunctionName": "IF(IF(additionalData=>state, \"nul\", \"In Progress\", additionalData=>state), 'Fraud', '0.0', IF(status,'94', '0.0',  IF(products=>status,'91', '0.0', ADD(MULTIPLY(IF(products=>type, 'package',products=>price=>total, '0.0'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(totals=>totalCurrency, 'SAR', '0.2667', IF(products=>price=>currency, 'AED', '0.2739', IF(products=>price=>currency, 'KWD', '3.28', IF(products=>price=>currency, 'BHD', '2.702', IF(products=>price=>currency, 'QAR', '0.2747', '0.0'))))))), MULTIPLY(MULTIPLY(IF(products=>type, 'rule', IF(products=>category, 'coupon', products=>price=>total, '0.0'), '0.0'), '-1'), COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(products=>price=>currency, 'SAR', '0.2667', IF(products=>price=>currency, 'AED', '0.2739', IF(products=>price=>currency, 'KWD', '3.28', IF(products=>price=>currency, 'BHD', '2.702', IF(products=>price=>currency, 'QAR', '0.2747', '0.0')))))))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_aed",
+          "jsonKeyName": "additionalData=>exchange",
+          "index": 42,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'AED', 'rate', 'null'), IF(products=>price=>currency, 'SAR', '0.98', IF(products=>price=>currency, 'AED', '1', IF(products=>price=>currency, 'KWD', '12.10', IF(products=>price=>currency, 'BHD', '9.73', IF(products=>price=>currency, 'QAR', '1.0', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "conversion_rate_usd",
+          "jsonKeyName": "additionalData=>exchange",
+          "index": 43,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(ARRAY_IF(additionalData=>exchange=>equivalent, 'code', 'USD', 'rate', 'null'), IF(products=>price=>currency, 'SAR', '0.2667', IF(products=>price=>currency, 'AED', '0.2739', IF(products=>price=>currency, 'KWD', '3.28', IF(products=>price=>currency, 'BHD', '2.702', IF(products=>price=>currency, 'QAR', '0.2747', '0.0'))))))",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "totals_currency",
+          "jsonKeyName": "totals=>totalCurrency",
+          "index": 44,
+          "mapFunctionName": "COALESCE(totals=>totalCurrency,'')",
+          "keyValueFlag": "value"
+        }
+      ]
+    },
+    {
+      "data_set_name": "fact_segment_details",
+      "fields": [
+        {
+          "fieldName": "id",
+          "jsonKeyName": "trackId,orderNumber",
+          "index": 0,
+          "mapFunctionName": "CONCAT(trackId,orderNumber)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_type",
+          "jsonKeyName": "type,products=>type",
+          "index": 2,
+          "mapFunctionName": "INCLUDE_IF(products=>type, 'flight')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "segment_id",
+          "jsonKeyName": "products=>options=>segment=>id",
+          "index": 3,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "segment_details",
+          "jsonKeyName": "products=>options=>segment=>id,products=>options=>segment:INCLUDE_PARENT,products=>options=>fare=>legDetails,products=>options=>leg",
+          "index": 4,
+          "mapFunctionName": "GET_SEGMENT_DETAILS(products=>options=>segment=>id,products=>options=>segment,products=>options=>fare=>legDetails,products=>options=>leg,'departure:arrival:duration=>text', 'cabinText:cabinCode', 'id')",
+          "keyValueFlag": "value"
+        }
+      ]
+    },
+    {
+      "data_set_name": "fact_vat_orders",
+      "fields": [
+        {
+          "fieldName": "id",
+          "jsonKeyName": "trackId,orderNumber",
+          "index": 0,
+          "mapFunctionName": "CONCAT(trackId,orderNumber)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "track_id",
+          "jsonKeyName": "trackId",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_type",
+          "jsonKeyName": "products=>type",
+          "index": 3,
+          "mapFunctionName": "INCLUDE_IF(products=>type, 'vat')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "total_vat",
+          "jsonKeyName": "products=>price=>total",
+          "index": 4,
+          "keyValueFlag": "key"
+        }
+      ]
+    },
+    {
+      "data_set_name": "fact_insurance_orders",
+      "fields": [
+        {
+          "fieldName": "id",
+          "jsonKeyName": "trackId,orderNumber",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "track_id",
+          "jsonKeyName": "trackId",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_no",
+          "jsonKeyName": "orderNumber",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "order_type",
+          "jsonKeyName": "products=>type",
+          "index": 3,
+          "mapFunctionName": "INCLUDE_IF(type, 'insurance')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "product_type",
+          "jsonKeyName": "products=>type",
+          "index": 4,
+          "mapFunctionName": "INCLUDE_IF(products=>type, 'insurance;rule')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_group_id",
+          "jsonKeyName": "groupId",
+          "index": 5,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_bookingdate_id",
+          "jsonKeyName": "products=>createdAt",
+          "index": 6,
+          "mapFunctionName": "DATE_FORMAT(COALESCE(products=>createdAt,createdAt), \"EEE MMM dd HH:mm:ss zzz yyyy\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_airline_pnr",
+          "jsonKeyName": "products=>additionalData=>policyNumber",
+          "index": 7,
+          "mapFunctionName": "COALESCE(products=>additionalData=>policyNumber,'')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_language",
+          "jsonKeyName": "additionalData=>headers=>x-locale",
+          "index": 8,
+          "mapFunctionName": "COALESCE(COALESCE(ARRAY_FIRST(products=>additionalData=>state_history,'user_detail=>headers=>accept-language', 'NONSTRICT'),IF(additionalData=>headers=>x-locale,'','en',additionalData=>headers=>x-locale)),'en')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_timezone",
+          "jsonKeyName": "additionalData=>headers=>x-tz",
+          "index": 9,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_source",
+          "jsonKeyName": "additionalData=>headers=>x-site-id",
+          "index": 10,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "client_browser",
+          "jsonKeyName": "additionalData=>headers=>user-agent",
+          "index": 11,
+          "mapFunctionName": "COALESCE(BROWSER_AGENT_STRING(additionalData=>headers=>user-agent,'BROWSER'),'')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "client_os",
+          "jsonKeyName": "additionalData=>headers=>user-agent",
+          "index": 12,
+          "mapFunctionName": "COALESCE(BROWSER_AGENT_STRING(additionalData=>headers=>user-agent,'OS'),'')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "ip_address",
+          "jsonKeyName": "additionalData=>headers=>x-real-ip",
+          "index": 13,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_state",
+          "jsonKeyName": "additionalData=>state",
+          "index": 14,
+          "mapFunctionName": "IF(additionalData=>state, \"null\", \"In Progress\", additionalData=>state)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_status_id",
+          "jsonKeyName": "products=>status",
+          "index": 15,
+          "mapFunctionName": "COALESCE(STR_SPLIT(products=>status,\".\",\"0\"),products=>status)",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_currency",
+          "jsonKeyName": "products=>price=>currency",
+          "index": 16,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_base_currency",
+          "jsonKeyName": "products=>price=>currency",
+          "index": 17,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_store_id",
+          "jsonKeyName": "storeId",
+          "index": 18,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_product_reference",
+          "jsonKeyName": "products=>additionalData=>policyNumber",
+          "index": 19,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_product_plancode",
+          "jsonKeyName": "products=>options=>planCode",
+          "index": 20,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_product_productscode",
+          "jsonKeyName": "products=>options=>productCode",
+          "index": 21,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_product_category",
+          "jsonKeyName": "products=>category",
+          "index": 22,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_paymentstatus_id",
+          "jsonKeyName": "products=>paymentStatus",
+          "index": 23,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "dim_vendor_name",
+          "jsonKeyName": "products=>vendorName",
+          "index": 24,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "tax",
+          "jsonKeyName": "products=>price=>tax",
+          "index": 25,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>tax,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "base_price",
+          "jsonKeyName": "products=>price=>base",
+          "index": 26,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>base,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "total",
+          "jsonKeyName": "products=>price=>total",
+          "index": 27,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>total,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "vat",
+          "jsonKeyName": "products=>price=>outputVat",
+          "index": 28,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>price=>outputVat,'0.0')",
+          "keyValueFlag": "value"
+        },
+        {
+          "fieldName": "qty",
+          "jsonKeyName": "products=>qty",
+          "index": 29,
+          "dataTypeName": "double",
+          "mapFunctionName": "COALESCE(products=>qty,'0.0')",
+          "keyValueFlag": "value"
+        }
+      ]
+    }
+  ]
+}

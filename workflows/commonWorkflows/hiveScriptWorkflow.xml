@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="hiveScript-${module}.xml">
+  <start to="executeSQL"/>
+  <action name="executeSQL">
+    <hive xmlns="uri:oozie:hive-action:0.5">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <job-xml>${hiveSiteConfigPath}</job-xml>
+      <script>${hiveScript}</script>
+     <param>hiveDB=${hiveDB}</param>
+    </hive>
+    <ok to="end"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <kill name="kill-1">
+    <message>Failure in hivescript comman Workflow upload</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>

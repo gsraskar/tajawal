@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="MdmHiveScript">
+<start to="MdmHiveScript"/>
+
+
+	<action name="MdmHiveScript">
+          <hive xmlns="uri:oozie:hive-action:0.5">
+           <job-tracker>${jobTracker}</job-tracker>
+           <name-node>${nameNode}</name-node>
+           <job-xml>${hiveSiteConfigPath}</job-xml>
+           <script>${hiveScript}</script>
+           <param>hiveDB=${HIVE_DB_NAME}</param>
+         </hive>
+        <ok to="end"/>
+        <error to="fail"/>
+    </action>
+
+<kill name="fail">
+  <message>workflow failed</message>
+</kill>
+  <end name="end"/>
+</workflow-app>

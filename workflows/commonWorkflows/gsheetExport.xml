@@ -1,0 +1,23 @@
+
+<workflow-app name="googleSheetsWorkflow-${workflow}" xmlns="uri:oozie:workflow:0.2">
+	<start to="export-csv" />
+
+        <action name="export-csv">
+                <java>
+                  <job-tracker>${jobTracker}</job-tracker>
+                  <name-node>${nameNode}</name-node>
+                  <main-class>com.tajawal.googlesheet.sdk.api.connector.GSheetCLI</main-class>
+                  <arg>-cp</arg>
+                  <arg>${cred_props}</arg>
+                  <arg>-sheets</arg>
+                  <arg>${sheet_path}</arg>
+                </java>
+                <ok to="end"/>
+                <error to="kill"/>
+        </action>
+        <kill name="kill">
+                <message>Workflow failed</message>
+        </kill>
+        <end name="end" />
+</workflow-app>
+

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="adjustdownload-${module}.xml">
+  <!--start to="java-1"/!-->
+<start to="getAdjustExecTime"/>
+<action name="getAdjustExecTime">
+  <shell xmlns="uri:oozie:shell-action:0.3">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${getAdjustExecTimeScript}</exec>
+     <argument>adjustIntermediate</argument>
+     <file>${getAdjustExecTimeScriptPath}#${getAdjustExecTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="java-1"/>
+     <error to="fail"/>
+</action>
+  <action name="localFStoHDFC">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${copyHDFSScript}</exec>
+      <argument>${localFSDirectory}</argument>
+      <argument>${HDFSFilePath}</argument>
+      <file>${copyHDFSScriptPath}#${copyHDFSScript}</file>
+      <file>${pemFile}#key.pem</file>
+    </shell>
+    <ok to="end"/>
+    <error to="handleFailure1"/>
+  </action>
+  <action name="handleFailure1">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${handleFailureScript}</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailureScriptPath}#${handleFailureScript}</file>
+    </shell>
+    <ok to="fail"/>
+    <error to="fail"/>
+  </action>
+  <action name="java-1">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>${ClassPath}</main-class>
+      <arg>-config</arg>
+      <arg>${ResourceFile_h0sa2g4rxc74_almosafer_ios}</arg>
+      <arg>-start_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["start_date"]}</arg>
+	<!--arg>2017-01-01</arg-->
+        <arg>-end_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["end_date"]}</arg>
+      <arg>-output</arg>
+      <arg>${localFSPath_h0sa2g4rxc74_almosafer_ios}</arg>
+      <file>${ResourceFilePath_h0sa2g4rxc74_almosafer_ios}#${ResourceFile_h0sa2g4rxc74_almosafer_ios}</file>
+    </java>
+    <ok to="java-2"/>
+    <error to="handleFailure1"/>
+  </action>
+  <action name="java-2">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>${ClassPath}</main-class>
+      <arg>-config</arg>
+      <arg>${ResourceFile_q6fu9u2pbxz3_almosafer}</arg>
+      <arg>-start_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["start_date"]}</arg>
+	<!--arg>2017-01-01</arg-->
+        <arg>-end_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["end_date"]}</arg>
+      <arg>-output</arg>
+      <arg>${localFSPath_q6fu9u2pbxz3_almosafer}</arg>
+      <file>${ResourceFilePath_q6fu9u2pbxz3_almosafer}#${ResourceFile_q6fu9u2pbxz3_almosafer}</file>
+    </java>
+    <ok to="java-3"/>
+    <error to="handleFailure1"/>
+  </action>
+  <action name="java-3">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>${ClassPath}</main-class>
+      <arg>-config</arg>
+      <arg>${ResourceFile_xiauf1fnfi0w_tajawal_android}</arg>
+      <arg>-start_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["start_date"]}</arg>
+	<!--arg>2017-01-01</arg-->
+        <arg>-end_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["end_date"]}</arg>
+      <arg>-output</arg>
+      <arg>${localFSPath_xiauf1fnfi0w_tajawal_android}</arg>
+      <file>${ResourceFilePath_xiauf1fnfi0w_tajawal_android}#${ResourceFile_xiauf1fnfi0w_tajawal_android}</file>
+    </java>
+    <ok to="java-4"/>
+    <error to="handleFailure1"/>
+  </action>
+  <action name="java-4">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>${ClassPath}</main-class>
+      <arg>-config</arg>
+      <arg>${ResourceFile_xl3pe3cgv3nm_tajawal_ios}</arg>
+      <arg>-start_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["start_date"]}</arg>
+	<!--arg>2017-01-01</arg-->
+        <arg>-end_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["end_date"]}</arg>
+      <arg>-output</arg>
+      <arg>${localFSPath_xl3pe3cgv3nm_tajawal_ios}</arg>
+      <file>${ResourceFilePath_xl3pe3cgv3nm_tajawal_ios}#${ResourceFile_xl3pe3cgv3nm_tajawal_ios}</file>
+    </java>
+    <ok to="java-5"/>
+    <error to="handleFailure1"/>
+  </action>
+  <action name="java-5">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>${ClassPath}</main-class>
+      <arg>-config</arg>
+      <arg>${ResourceFile_ycb6df7fv7cw_almosafer_android}</arg>
+      <arg>-start_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["start_date"]}</arg>
+	<!--arg>2017-01-01</arg-->
+        <arg>-end_date</arg>
+        <arg>${wf:actionData("getAdjustExecTime")["end_date"]}</arg>
+      <arg>-output</arg>
+      <arg>${localFSPath_ycb6df7fv7cw_almosafer_android}</arg>
+      <file>${ResourceFilePath_ycb6df7fv7cw_almosafer_android}#${ResourceFile_ycb6df7fv7cw_almosafer_android}</file>
+    </java>
+    <ok to="end"/>
+    <error to="handleFailure1"/>
+  </action>
+<action name="loadToHiveIncremental">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${loadToHiveActionScript}</exec>
+                <argument>${hiveDB}</argument>
+                <argument>${hiveLoadTableName}</argument>
+                <argument>${hiveLoadPath}</argument>
+                <argument>${hiveLoadFilename}</argument>
+
+                 <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${loadToHiveActionScriptPath}#${loadToHiveActionScript}</file>
+                </shell>
+                <ok to="end"/>
+                <error to="fail"/>
+        </action>
+
+<kill name="fail">
+  <message>workflow failed</message>
+</kill>
+  <decision name="decision-1">
+    <switch>
+      <case to="localFStoHDFC">${UploadtoHDFS eq 'true'}</case>
+      <default to="end"/>
+    </switch>
+  </decision>
+  <end name="end"/>
+</workflow-app>
+<!--
+     <workflow>
+  <node name="start" x="20" y="245"/>
+  <node name="localFStoHDFC" x="448" y="173"/>
+  <node name="handleFailure" x="294" y="334"/>
+  <node name="java-1" x="195" y="202"/>
+  <node name="decision-1" x="309" y="192"/>
+  <node name="end" x="579" y="242"/>
+</workflow>-->

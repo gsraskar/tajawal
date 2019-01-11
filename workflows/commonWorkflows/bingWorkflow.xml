@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="Bing_data_pull">
+<start to="BingExecTime"/>
+  <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${handleFailureScript}</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailureScriptPath}#${handleFailureScript}</file>
+    </shell>
+    <ok to="fail"/>
+    <error to="fail"/>
+  </action>
+  <action name="BingExecTime">
+  <shell xmlns="uri:oozie:shell-action:0.3">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${getBingExecTimeScript}</exec>
+     <argument>BingIntermediate</argument>
+     <file>${getBingExecTimeScriptPath}#${getBingExecTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="java-1"/>
+     <error to="fail"/>
+</action>
+  <action name="java-1">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>com.bing.cli.BingCli</main-class>
+      <arg>-start_date</arg>
+      <arg>${wf:actionData("BingExecTime")["start_date"]}</arg>
+      <!--arg>20180301</arg-->
+      <arg>-end_date</arg>
+      <!--arg>20180302</arg-->
+      <arg>${wf:actionData("BingExecTime")["end_date"]}</arg>
+      <arg>-accountId</arg>
+      <arg>${accountId}</arg>
+      <arg>-accountName</arg>
+      <arg>${accountName}</arg>
+      <arg>-clientId</arg>
+      <arg>${clientId}</arg>
+      <arg>-clientSecret</arg>
+      <arg>${clientSecret}</arg>
+      <arg>-customerId</arg>
+      <arg>${customerId}</arg>
+      <arg>-developerToken</arg>
+      <arg>${developerToken}</arg>
+      <arg>-downloadReportPath</arg>
+      <arg>${downloadReportPath}</arg>      
+      <arg>-outPath</arg>
+      <arg>${outPath}</arg>	    
+    </java>
+    <ok to="end"/>
+    <error to="fail"/>
+  </action>
+
+    
+<kill name="fail">
+  <message>workflow failed</message>
+</kill>
+  <end name="end"/>
+</workflow-app>
+
+<!--
+     <workflow>
+  <node name="start" x="20" y="245"/>
+  <node name="localFStoHDFC" x="448" y="173"/>
+  <node name="handleFailure" x="294" y="334"/>
+  <node name="java-1" x="195" y="202"/>
+  <node name="decision-1" x="309" y="192"/>
+  <node name="end" x="579" y="242"/>
+</workflow>-->

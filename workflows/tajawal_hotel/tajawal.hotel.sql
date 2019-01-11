@@ -1,0 +1,16 @@
+
+Drop table if exists bi.fact_hotel_orders;
+create table if not exists bi.fact_hotel_orders(order_no varchar(200),dim_group_id varchar(200),order_type varchar(200),office_id varchar(200),site_id varchar(200),dim_product_category_type varchar(200),dim_bookingdate_id varchar(200),dim_booking_hour varchar(200),dim_booking_timestamp varchar(200),dim_hotel_id varchar(200),dim_supplier_id varchar(200),dim_vendor_id varchar(200),dim_supplier_currency varchar(200),dim_customer_id varchar(200),dim_store_id varchar(200),dim_language_id varchar(200),dim_checkin_date_id varchar(200),dim_checkin_hour varchar(200),dim_checkout_date_id varchar(200),dim_checkout_hour varchar(200),dim_total_currency varchar(200),dim_request_currency_id varchar(200),dim_promo_id varchar(200),dim_status_id varchar(200),dim_state_id varchar(200),dim_bookingtype_id varchar(200),dim_cancellation_policy varchar(200),dim_ratetype varchar(200),dim_markup_currency varchar(200),dim_paymentstatus_id varchar(200),payment_amount double,booking_value double,supplier_cost double,conversion_rate_aed double,conversion_rate_usd double,room_count int,length_of_stay int,booking_window int,pax_count int,discount_amount double,payment_amount_usd double,discount_amount_usd double,iov double,gbv double)
+;
+Drop table if exists bi.fact_flight_orders;
+create table if not exists bi.fact_flight_orders(order_type varchar(200),dim_group_id varchar(200),order_no varchar(200),dim_office_id varchar(200),dim_bookingdate_id varchar(200),dim_booking_hour varchar(200),dim_booking_timestamp varchar(200),dim_travel_date varchar(200),dim_travel_hour varchar(200),site_id varchar(200),dim_store_id varchar(200),dim_promo_id varchar(200),dim_customer_id varchar(200),dim_language varchar(200),dim_origin varchar(200),dim_destination varchar(200),dim_flightcode_leg1 varchar(200),dim_airline_leg1 varchar(200),dim_flightcode_leg2 varchar(200),dim_airlinecode_leg2 varchar(200),dim_trip_type varchar(200),dim_journey_type varchar(200),dim_totals_currency varchar(200),dim_status_id varchar(200),dim_paymentstatus_id varchar(200),dim_state_id varchar(200),conversion_rate_aed double,conversion_rate_usd double,payment_amount double,adult_count int,children_count int,infants_count int,no_of_passengers int,total_seat int,no_of_legs int,no_of_segments int,discount_amount double,booking_window int,payment_amount_usd double,discount_amount_usd double,iov double,gbv double)
+;
+Drop table if exists bi.dim_hotel;
+create table if not exists bi.dim_hotel(dim_hotel_id varchar(200),name varchar(200),address varchar(200),city varchar(200),district varchar(200),country_code varchar(200),star_rating varchar(200),longitude varchar(200),latitude varchar(200),zipcode varchar(200))
+;
+Drop table if exists bi.dim_customer;
+create table if not exists bi.dim_customer(dim_customer_id varchar(200),email varchar(200),firstname varchar(200),lastname varchar(200),phone varchar(200),title varchar(200),country varchar(200))
+;
+Drop table if exists bi.dim_room;
+create table if not exists bi.dim_room(room_id varchar(200),name varchar(200),room_class varchar(200),room_type varchar(200))
+;

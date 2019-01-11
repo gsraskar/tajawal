@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="MdmSqoopImport">
+<start to="decision-1"/>
+  
+  <!--action name="importTableA">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${sqoopImportScrit}</exec>
+					
+                <argument>${MYSQL_HOST}</argument>
+		            <argument>${MYSQL_USER_NAME}</argument>
+		            <argument>${MYSQL_PASSWORD}</argument>
+                <argument>${MYSQL_DB_NAME}</argument>
+                <argument>${MYSQL_TABLE_NAME_A}</argument>
+		            <argument>${HIVE_DB_NAME}</argument>
+		            <argument>${HIVE_TABLE_NAME_A}</argument>
+                <argument>${HIVE_TEMP_TABLE_NAME_A}</argument>
+		            <argument>${SQOOP_TARGET_DIR_A}</argument>
+		            <argument>${DELEMETER_A}</argument>
+					
+                <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${sqoopImportScritPath}#${sqoopImportScrit}</file>
+                </shell>
+                <ok to="decision-1"/>
+                <error to="fail"/>
+        </action-->
+
+		<decision name="decision-1">
+		    <switch>
+		      <case to="importTableB">${uploadMySQLTableB eq 'true'}</case>
+		      <default to="end"/>
+		    </switch>
+	        </decision>
+   
+     <action name="importTableB">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${sqoopImportScrit}</exec>
+
+                <argument>${MYSQL_HOST}</argument>
+                <argument>${MYSQL_USER_NAME}</argument>
+                <argument>${MYSQL_PASSWORD}</argument>
+                <argument>${MYSQL_DB_NAME}</argument>
+                <argument>${MYSQL_TABLE_NAME_B}</argument>
+                <argument>${HIVE_DB_NAME}</argument>
+                <argument>${HIVE_TABLE_NAME_B}</argument>
+                <argument>${HIVE_TEMP_TABLE_NAME_B}</argument>
+                <argument>${SQOOP_TARGET_DIR_B}</argument>
+                <argument>${DELEMETER_B}</argument>
+
+                <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${sqoopImportScritPath}#${sqoopImportScrit}</file>
+                </shell>
+                <ok to="decision-2"/>
+                <error to="fail"/>
+        </action>
+
+	<decision name="decision-2">
+                    <switch>
+                      <case to="importTableC">${uploadMySQLTableC eq 'true'}</case>
+                      <default to="end"/>
+                    </switch>
+        </decision>
+
+	<action name="importTableC">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${sqoopImportScrit}</exec>
+
+                <argument>${MYSQL_HOST}</argument>
+                <argument>${MYSQL_USER_NAME}</argument>
+                <argument>${MYSQL_PASSWORD}</argument>
+                <argument>${MYSQL_DB_NAME}</argument>
+                <argument>${MYSQL_TABLE_NAME_C}</argument>
+                <argument>${HIVE_DB_NAME}</argument>
+                <argument>${HIVE_TABLE_NAME_C}</argument>
+                <argument>${HIVE_TEMP_TABLE_NAME_C}</argument>
+                <argument>${SQOOP_TARGET_DIR_C}</argument>
+                <argument>${DELEMETER_C}</argument>
+
+                <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${sqoopImportScritPath}#${sqoopImportScrit}</file>
+                </shell>
+                <ok to="decision-3"/>
+                <error to="fail"/>
+        </action>
+ 
+        <!--> Import dim_spend_channels_mdm <-->
+	<decision name="decision-3">
+                    <switch>
+                      <case to="importTableD">${uploadMySQLTableD eq 'true'}</case>
+                      <default to="end"/>
+                    </switch>
+        </decision>
+
+        <action name="importTableD">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${sqoopImportScrit}</exec>
+
+                <argument>${MYSQL_HOST}</argument>
+                <argument>${MYSQL_USER_NAME}</argument>
+                <argument>${MYSQL_PASSWORD}</argument>
+                <argument>${MYSQL_DB_NAME}</argument>
+                <argument>${MYSQL_TABLE_NAME_D}</argument>
+                <argument>${HIVE_DB_NAME}</argument>
+                <argument>${HIVE_TABLE_NAME_D}</argument>
+                <argument>${HIVE_TEMP_TABLE_NAME_D}</argument>
+                <argument>${SQOOP_TARGET_DIR_D}</argument>
+                <argument>${DELEMETER_D}</argument>
+
+                <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${sqoopImportScritPath}#${sqoopImportScrit}</file>
+                </shell>
+                <ok to="end"/>
+                <error to="fail"/>
+        </action>
+
+
+
+
+        <!-->Direct import test dim_spend_channels_mdm<-->
+	<decision name="decision-x">
+                    <switch>
+                      <case to="importTableD">${uploadMySQLTableD eq 'true'}</case>
+                      <default to="end"/>
+                    </switch>
+        </decision>     
+
+   <action name="importTableX">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>import -connect jdbc:mysql://${MYSQL_HOST}:3306/${MYSQL_DB_NAME}  -m 1 --username ${MYSQL_USER_NAME} --password ${MYSQL_PASSWORD} --table ${MYSQL_TABLE_NAME_D}  --target-dir ${SQOOP_TARGET_DIR_D} --fields-terminated-by "${DELEMETER_D}" --hive-import --hive-overwrite --hive-table ${HIVE_DB_NAME}.${HIVE_TABLE_NAME_D}</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="end"/>
+    <error to="fail"/>
+  </action>
+
+<kill name="fail">
+  <message>workflow failed</message>
+</kill>
+  <end name="end"/>
+</workflow-app>

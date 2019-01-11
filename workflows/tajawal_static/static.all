@@ -1,0 +1,3 @@
+dim_groups=/home/dataeaze/chaitanya/tajawal/tajawal_static/groups.tsv
+dim_payment_status=/home/dataeaze/chaitanya/tajawal/tajawal_static/payment_status.tsv
+dim_status=/home/dataeaze/chaitanya/tajawal/tajawal_static/status.tsv

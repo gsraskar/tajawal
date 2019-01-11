@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="DriverWorkflowTrivago">
+  <start to="trivago_data_transform"/>
+ <!--start to="uplaodToMysql"/-->
+
+<!-- Fork-1 goes to join 1 -->
+
+<action name="trivago_data_transform">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/trivagoWorkflow.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="trivago_hive_upload"/>
+  <error to="handleFailure"/>
+</action>
+
+<action name="trivago_hive_upload">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/trivago/trivagoHiveUpload.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="end"/>
+  <error to="handleFailure"/>
+</action>
+
+
+
+ <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <kill name="kill-1">
+    <message>Some failure occurred</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+
+
+

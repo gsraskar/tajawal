@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="Criteo">
+<start to="CriteoExecTime"/>
+  <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${handleFailureScript}</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailureScriptPath}#${handleFailureScript}</file>
+    </shell>
+    <ok to="fail"/>
+    <error to="fail"/>
+  </action>
+  <action name="CriteoExecTime">
+  <shell xmlns="uri:oozie:shell-action:0.3">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${getCriteoExecTimeScript}</exec>
+     <argument>CriteoIntermediate</argument>
+     <file>${getCriteoExecTimeScriptPath}#${getCriteoExecTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="java-1"/>
+     <error to="fail"/>
+</action>
+  <action name="java-1">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>com.tajawal.cli.CriteoConnectorCli</main-class>
+      <arg>-start_date</arg>
+      <arg>${wf:actionData("CriteoExecTime")["start_date"]}</arg>
+      <!--arg>2017-08-31</arg-->
+      <arg>-end_date</arg>
+      <!--arg>2017-09-10</arg-->
+      <arg>${wf:actionData("CriteoExecTime")["end_date"]}</arg>
+      <arg>-account_name</arg>
+      <arg>${account_name}</arg>
+	    <arg>-login_email</arg>
+      <arg>${login_email}</arg>
+      <arg>-app_token</arg>
+      <arg>${app_token}</arg>
+      <arg>-password</arg>
+      <arg>${password}</arg>
+      <arg>-out_path</arg>
+      <arg>${out_path}</arg>
+	  <arg>-delimiter</arg>
+	  <arg>${delimiter}</arg>
+    </java>
+    <ok to="loadToHiveIncremental"/>
+    <error to="handleFailure"/>
+  </action>
+
+  <action name="loadToHiveIncremental">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${loadToHiveActionScript}</exec>
+                <argument>${hiveDB}</argument>
+                <argument>${hiveLoadTableName}</argument>
+		<argument>${hiveLoadPath}</argument>
+		<argument>${hiveLoadFilename}</argument>
+
+                 <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${loadToHiveActionScriptPath}#${loadToHiveActionScript}</file>
+                </shell>
+                <ok to="end"/>
+                <error to="handleFailure"/>
+        </action>
+  
+<kill name="fail">
+  <message>workflow failed</message>
+</kill>
+  <end name="end"/>
+</workflow-app>
+
+<!--
+     <workflow>
+  <node name="start" x="20" y="245"/>
+  <node name="localFStoHDFC" x="448" y="173"/>
+  <node name="handleFailure" x="294" y="334"/>
+  <node name="java-1" x="195" y="202"/>
+  <node name="decision-1" x="309" y="192"/>
+  <node name="end" x="579" y="242"/>
+</workflow>-->

@@ -1,0 +1,169 @@
+{
+  "data_sets": [
+    {
+      "data_set_name": "mixpanel_data",
+      "fields": [
+        {
+          "fieldName": "event",
+          "jsonKeyName": "event",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "time",
+          "jsonKeyName": "properties=>time",
+          "index": 1,
+	  "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "distinct_id",
+          "jsonKeyName": "properties=>distinct_id",
+          "index": 2,
+          "mapFunctionName": "COALESCE(properties=>distinct_id,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "app_build_number",
+          "jsonKeyName": "properties=>$app_build_number",
+          "index": 3,
+          "mapFunctionName": "COALESCE(properties=>$app_build_number,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "app_release",
+          "jsonKeyName": "properties=>$app_release",
+          "index": 4,
+          "mapFunctionName": "COALESCE(properties=>$app_release,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "app_version",
+          "jsonKeyName": "properties=>$app_version",
+          "index": 5,
+          "mapFunctionName": "COALESCE(properties=>$app_version,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "app_version_string",
+          "jsonKeyName": "properties=>$app_version_string",
+          "index": 6,
+          "mapFunctionName": "COALESCE(properties=>$app_version_string,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "carrier",
+          "jsonKeyName": "properties=>$carrier",
+          "index": 7,
+          "mapFunctionName": "COALESCE(properties=>$carrier,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "city",
+          "jsonKeyName": "properties=>$city",
+          "index": 8,
+          "mapFunctionName": "COALESCE(properties=>$city,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "ios_ifa",
+          "jsonKeyName": "properties=>$ios_ifa",
+          "index": 9,  
+          "mapFunctionName": "COALESCE(properties=>$ios_ifa,'NA')", 
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "lib_version",
+          "jsonKeyName": "properties=>$lib_version",
+          "index": 10,
+          "mapFunctionName": "COALESCE(properties=>$lib_version,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "manufacturer",
+          "jsonKeyName": "properties=>$manufacturer",
+          "index": 11,
+          "mapFunctionName": "COALESCE(properties=>$manufacturer,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "model",
+          "jsonKeyName": "properties=>$model",
+          "index": 12,
+          "mapFunctionName": "COALESCE(properties=>$model,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "os",
+          "jsonKeyName": "properties=>$os",
+          "index": 13,
+          "mapFunctionName": "COALESCE(properties=>$os,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "os_version",
+          "jsonKeyName": "properties=>$os_version",
+          "index": 14,
+          "mapFunctionName": "COALESCE(properties=>$os_version,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "radio",
+          "jsonKeyName": "properties=>$radio",
+          "index": 15,
+	  "mapFunctionName": "COALESCE(properties=>$radio,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "region",
+          "jsonKeyName": "properties=>$region",
+          "index": 16,
+          "mapFunctionName": "COALESCE(properties=>$region,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "screen_height",
+          "jsonKeyName": "properties=>$screen_height",
+          "index": 17,
+          "mapFunctionName": "COALESCE(properties=>$screen_height,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "screen_width",
+          "jsonKeyName": "properties=>$screen_width ",
+          "index": 18,
+          "mapFunctionName": "COALESCE(properties=>$screen_width,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "wifi",
+          "jsonKeyName": "properties=>$wifi",
+          "index": 19,
+          "mapFunctionName": "COALESCE(properties=>$wifi,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "mp_country_code",
+          "jsonKeyName": "properties=>mp_country_code",
+          "index": 20,
+          "mapFunctionName": "COALESCE(properties=>mp_country_code,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "mp_device_model",
+          "jsonKeyName": "properties=>mp_device_model",
+          "index": 21,
+          "mapFunctionName": "COALESCE(properties=>mp_device_model,'NA')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "mp_lib",
+          "jsonKeyName": "properties=>mp_lib",
+          "index": 22,
+	  "mapFunctionName": "COALESCE(properties=>mp_lib,'NA')",
+          "keyValueFlag": "key"
+        }
+      ]
+    }
+  ]
+}
+

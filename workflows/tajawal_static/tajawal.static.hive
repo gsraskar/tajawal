@@ -1,0 +1,22 @@
+
+Drop table if exists tajawal_bi.dim_store;
+create table if not exists tajawal_bi.dim_store(store_id String,store_name String,group_id String,group_name String,currency String,site String,type String,amd_office String)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+
+create table if not exists tajawal_bi.dim_groups(store_id String,store_name String,group_id String,group_name String,currency String,site String,type String,amd_office String)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+Drop table if exists tajawal_bi.dim_payment_status;
+create table if not exists tajawal_bi.dim_payment_status(payment_status_id String,payment_status String)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+Drop table if exists tajawal_bi.dim_status;
+create table if not exists tajawal_bi.dim_status(status_id String,status String)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+Drop table if exists tajawal_bi.dim_groups;
+create table if not exists tajawal_bi.dim_groups(group_id String,group_name String)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
+

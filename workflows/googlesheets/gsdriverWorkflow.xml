@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="DriverWorkflowTajawalGoogleSheets.xml">
+  <start to="gs_download"/>
+ <!--start to="gs_uplaodToMysql2"/-->
+
+<action name="gs_download">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/gsheetExport.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="gs_loadToHive"/>
+  <error to="kill-1"/>
+</action>
+<action name="gs_loadToHive">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/mongoTransform.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="gs_uplaodToMysql2"/>
+  <error to="handleFailure"/>
+</action>
+<fork name="fork-mysql-upload">
+      <path start="gs_uplaodToMysql1"/>
+      <path start="gs_uplaodToMysql2"/>
+</fork>
+<action name="gs_uplaodToMysql1">
+    <sub-workflow>
+        <app-path>${oozieProjectRoot}/commonWorkflows/mysqlUploadWorkflow.xml</app-path>
+<propagate-configuration/>
+    </sub-workflow>
+    <ok to="join-mysql-upload"/>
+    <error to="handleFailure"/>
+</action>
+<action name="gs_uplaodToMysql2">
+    <sub-workflow>
+        <app-path>${oozieProjectRoot}/commonWorkflows/mysqlUploadWorkflow2.xml</app-path>
+<propagate-configuration/>
+    </sub-workflow>
+    <ok to="end"/>
+    <error to="handleFailure"/>
+</action>
+<join name="join-mysql-upload" to="end"/>
+
+ <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <kill name="kill-1">
+    <message>Some failure occurred</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+
+
+

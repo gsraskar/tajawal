@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="DriverWorkflowTajawalGoogleAnalytics">
+  <start to="recordCurrTime"/>
+ <!--start to="uplaodToMysql"/-->
+
+<!-- Fork-1 goes to join 1 -->
+<action name="recordCurrTime">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${currTimeScript}</exec>
+     <file>${currTimeScriptPath}#${currTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="getExecTime"/>
+     <error to="kill-1"/>
+</action>
+<action name="getExecTime">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${getExecTimeScript}</exec>
+     <argument>${module}</argument>
+     <file>${getExecTimeScriptPath}#${getExecTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="modifyGoogleAnalyticsTime"/>
+     <error to="kill-1"/>
+</action>
+<action name="modifyGoogleAnalyticsTime">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${modifyConfigScript}</exec>
+        <argument>${wf:actionData("getExecTime")["exec_time"]}</argument>
+        <argument>${wf:actionData("recordCurrTime")["curr_time"]}</argument>
+<argument>GAIntermediate</argument>
+
+        <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+     <file>${modifyConfigScriptPath}#${modifyConfigScript}</file>
+<capture-output/>
+  </shell>
+     <ok to="ga_download"/>
+     <error to="kill-1"/>
+</action>
+
+<action name="ga_download">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/gaWorkflow.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="ga_mapreduce"/>
+  <error to="handleFailure"/>
+</action>
+<action name="ga_mapreduce">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/mongoTransform.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <ok to="uplaodToMysql"/>
+  <error to="handleFailure"/>
+</action>
+<action name="uplaodToMysql">
+    <sub-workflow>
+        <app-path>${oozieProjectRoot}/commonWorkflows/incr_generic_mysql_upload.xml</app-path>
+<propagate-configuration/>
+    </sub-workflow>
+    <ok to="recordExecTime"/>
+    <error to="handleFailure"/>
+</action>
+<action name="recordExecTime">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${recordExecTimeScript}</exec>
+     <argument>${wf:actionData("recordCurrTime")["curr_time"]}</argument>
+     <argument>${module}</argument>
+     <file>${recordExecTimeScriptPath}#${recordExecTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="hiveInsert"/>
+     <error to="kill-1"/>
+</action>
+
+<action name="hiveInsert">
+  <shell xmlns="uri:oozie:shell-action:0.1">
+  <job-tracker>${jobTracker}</job-tracker>
+  <name-node>${nameNode}</name-node>
+  <exec>${hiveIncrScript}</exec>
+  <argument>${hiveDB}.${hiveTableAIncr}</argument>
+  <argument>${hiveDB}.${mysqlFinalTableA}</argument>
+  <argument>${hiveDB}.${hiveTableBIncr}</argument>
+  <argument>${hiveDB}.${hiveTableBFinal}</argument>
+  <file>${hiveIncrScriptPath}#${hiveIncrScript}</file>
+  </shell>
+  <ok to="end"/>
+  <error to="handleFailure"/>
+</action>
+
+ <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <kill name="kill-1">
+    <message>Some failure occurred</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+

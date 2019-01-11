@@ -1,0 +1,111 @@
+--set db_name=tajawal_uat_bi;
+--set hive.mv.files.thread=0;
+drop table if exists ${hiveDB}.inter2_all_customer_orders;
+create table ${hiveDB}.inter2_all_customer_orders
+as
+select fd.dim_bookingdate_id, dg.group_id, fd.order_type, ds.type, ds.pos, ds.country,fd.dim_customer_id,fd.order_no
+from
+${hiveDB}.fact_flight_orders_final fd 
+--inner join ${hiveDB}.dim_customer dc on fd.dim_customer_id = dc.dim_customer_id
+--left outer join ${hiveDB}.dim_store ds on dc.first_store_id = ds.store_id
+--inner join ${hiveDB}.dim_groups dg on dc.first_order_group = dg.group_id
+left outer join ${hiveDB}.dim_store ds on fd.dim_store_id = ds.store_id
+inner join ${hiveDB}.dim_groups dg on fd.dim_group_id = dg.group_id
+union all
+select fd.dim_bookingdate_id, dg.group_id, fd.order_type, ds.type, ds.pos, ds.country,fd.dim_customer_id, fd.order_no
+from
+${hiveDB}.fact_hotel_orders_final fd 
+--inner join ${hiveDB}.dim_customer dc on fd.dim_customer_id = dc.dim_customer_id
+--left outer join ${hiveDB}.dim_store ds on dc.first_store_id = ds.store_id
+--inner join ${hiveDB}.dim_groups dg on dc.first_order_group = dg.group_id
+left outer join ${hiveDB}.dim_store ds on fd.dim_store_id = ds.store_id
+inner join ${hiveDB}.dim_groups dg on fd.dim_group_id = dg.group_id
+;
+
+-- Query 1 : Insert all records
+drop table if exists ${hiveDB}.inter_all_customer_orders;
+create table ${hiveDB}.inter_all_customer_orders as select * from ${hiveDB}.inter2_all_customer_orders;
+-- Query 2 : Insert records where pos and country are 'ALL' 
+insert into ${hiveDB}.inter_all_customer_orders select dim_bookingdate_id, group_id, order_type, type, 'all' as pos, 'all' as country, dim_customer_id, order_no from ${hiveDB}.inter2_all_customer_orders;
+drop table if exists ${hiveDB}.inter2_all_customer_orders;
+alter table ${hiveDB}.inter_all_customer_orders rename to ${hiveDB}.inter2_all_customer_orders;
+-- Query 3 : Insert records where type is 'ALL'
+drop table if exists ${hiveDB}.inter_all_customer_orders;
+create table ${hiveDB}.inter_all_customer_orders as select * from ${hiveDB}.inter2_all_customer_orders;
+insert into ${hiveDB}.inter_all_customer_orders select dim_bookingdate_id, group_id, order_type, 'all' as type, pos, country, dim_customer_id, order_no from ${hiveDB}.inter2_all_customer_orders;
+drop table if exists ${hiveDB}.inter2_all_customer_orders;
+alter table ${hiveDB}.inter_all_customer_orders rename to ${hiveDB}.inter2_all_customer_orders;
+-- Query 4 : Insert records where order_type is 'ALL'
+drop table if exists ${hiveDB}.inter_all_customer_orders;
+create table ${hiveDB}.inter_all_customer_orders as select * from ${hiveDB}.inter2_all_customer_orders;
+insert into ${hiveDB}.inter_all_customer_orders select dim_bookingdate_id, group_id, 'all' as order_type, type, pos, country, dim_customer_id, order_no from ${hiveDB}.inter2_all_customer_orders;
+drop table if exists ${hiveDB}.inter2_all_customer_orders;
+alter table ${hiveDB}.inter_all_customer_orders rename to ${hiveDB}.inter2_all_customer_orders;
+-- Query 5 : Insert records where group_id is 'ALL'
+drop table if exists ${hiveDB}.inter_all_customer_orders;
+create table ${hiveDB}.inter_all_customer_orders as select * from ${hiveDB}.inter2_all_customer_orders;
+insert into ${hiveDB}.inter_all_customer_orders select dim_bookingdate_id, 'all' as group_id, order_type, type, pos, country, dim_customer_id, order_no from ${hiveDB}.inter2_all_customer_orders;
+drop table if exists ${hiveDB}.inter2_all_customer_orders;
+alter table ${hiveDB}.inter_all_customer_orders rename to ${hiveDB}.inter2_all_customer_orders;
+
+-- Final Query : To calculate result at pre aggregated levels
+drop table if exists ${hiveDB}.tajawal_new_customer_analysis_intermediate;
+--create table ${hiveDB}.tajawal_new_customer_analysis_intermediate row format delimited fields terminated by '\t' as
+create table ${hiveDB}.tajawal_new_customer_analysis_intermediate as
+select dd.year_number, dd.month_name, group_name, order_type, type, pos, a.country,
+count(distinct(a.dim_customer_id)) total_customers,
+count(distinct(order_no)) as total_bookings,
+count(distinct(case when dd.mmyyyy = dc.mmyyyy then a.dim_customer_id else null end)) new_customers,
+count(distinct(case when dd.mmyyyy = dc.mmyyyy then order_no else null end)) new_customer_bookings
+from ${hiveDB}.inter2_all_customer_orders a
+inner join ${hiveDB}.dim_date dd on a.dim_bookingdate_id = dd.dim_date_id
+inner join ${hiveDB}.dim_customer ddc on a.dim_customer_id = ddc.dim_customer_id
+inner join ${hiveDB}.dim_date dc on ddc.first_order_date = dc.dim_date_id
+group by dd.year_number, dd.month_name, group_name, order_type, type, pos, a.country;
+drop table if exists ${hiveDB}.report_tajawal_new_customer_analysis;
+alter table ${hiveDB}.tajawal_new_customer_analysis_intermediate rename to ${hiveDB}.report_tajawal_new_customer_analysis;
+
+-- Final Query : To calculate cohort data result
+drop table if exists ${hiveDB}.tajawal_cohort_customer_analysis_intermediate;
+--create table ${hiveDB}.tajawal_cohort_customer_analysis_intermediate row format delimited fields terminated by '\t' as
+create table ${hiveDB}.tajawal_cohort_customer_analysis_intermediate as
+select dc.year_number as first_order_year, dc.month_name as first_month_name, dd.year_number as transaction_year, dd.month_name as transaction_month, group_name, order_type, type, pos, a.country,
+count(distinct(a.dim_customer_id)) as customer_count, count(distinct(order_no)) as total_bookings
+from ${hiveDB}.inter2_all_customer_orders a
+inner join ${hiveDB}.dim_date dd on a.dim_bookingdate_id = dd.dim_date_id
+inner join ${hiveDB}.dim_customer ddc on a.dim_customer_id = ddc.dim_customer_id
+inner join ${hiveDB}.dim_date dc on ddc.first_order_date = dc.dim_date_id
+group by dc.year_number, dc.month_name, dd.year_number, dd.month_name, group_name, order_type, type, pos, a.country;
+drop table if exists ${hiveDB}.report_tajawal_cohort_customer_analysis;
+alter table ${hiveDB}.tajawal_cohort_customer_analysis_intermediate rename to ${hiveDB}.report_tajawal_cohort_customer_analysis;
+
+-- Final Query : To calculate 
+drop table if exists ${hiveDB}.tajawal_brandwise_existing_customer_analysis_intermediate;
+--create table ${hiveDB}.tajawal_brandwise_existing_customer_analysis_intermediate row format delimited fields terminated by '\t' as
+create table ${hiveDB}.tajawal_brandwise_existing_customer_analysis_intermediate as
+select * from (
+select dd.year_number, dd.month_name, group_name, order_type, type, pos, a.country,
+ddc.first_order_group as first_brand, ddc.first_product as first_product,
+count(distinct(a.dim_customer_id)) total_customers,
+count(distinct(case when dd.mmyyyy != dc.mmyyyy then a.dim_customer_id else null end)) existing_customers
+from ${hiveDB}.inter2_all_customer_orders a
+inner join ${hiveDB}.dim_date dd on a.dim_bookingdate_id = dd.dim_date_id
+inner join ${hiveDB}.dim_customer ddc on a.dim_customer_id = ddc.dim_customer_id
+inner join ${hiveDB}.dim_date dc on ddc.first_order_date = dc.dim_date_id
+group by dd.year_number, dd.month_name, group_name, order_type, type, pos, a.country, ddc.first_order_group, ddc.first_product
+
+union all
+
+select dd.year_number, dd.month_name, group_name, order_type, type, pos, a.country,
+'all' as first_brand, 'all' as first_product,
+count(distinct(a.dim_customer_id)) total_customers,
+count(distinct(case when dd.mmyyyy != dc.mmyyyy then a.dim_customer_id else null end)) existing_customers
+from ${hiveDB}.inter2_all_customer_orders a
+inner join ${hiveDB}.dim_date dd on a.dim_bookingdate_id = dd.dim_date_id
+inner join ${hiveDB}.dim_customer ddc on a.dim_customer_id = ddc.dim_customer_id
+inner join ${hiveDB}.dim_date dc on ddc.first_order_date = dc.dim_date_id
+group by dd.year_number, dd.month_name, group_name, order_type, type, pos, a.country
+) Z 
+;
+drop table if exists ${hiveDB}.report_tajawal_brandwise_existing_customer_analysis;
+alter table ${hiveDB}.tajawal_brandwise_existing_customer_analysis_intermediate rename to ${hiveDB}.report_tajawal_brandwise_existing_customer_analysis;

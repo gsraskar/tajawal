@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="TrivagoDataTransform">
+<start to="java1"/>
+ 
+  <action name="java1">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>com.trivago.main.TrivagoDataTransrorm</main-class>
+      <arg>-in_path</arg>
+      <arg>${in_path}</arg>
+      <arg>-out_path</arg>
+      <arg>${out_path}</arg>
+	    <arg>-delimiter</arg>
+	  <arg>${delimiter}</arg>
+    </java>
+    <ok to="end"/>
+    <error to="fail"/>
+  </action>
+
+  <action name="executeHiveScript">
+    <hive xmlns="uri:oozie:hive-action:0.5">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <job-xml>${hiveSiteConfigPath}</job-xml>
+      <script>${hiveScript}</script>
+      <param>hiveDB=${hiveDB}</param>
+    </hive>
+    <ok to="end"/>
+    <error to="fail"/>
+  </action>
+  
+<kill name="fail">
+  <message>workflow failed</message>
+</kill>
+  <end name="end"/>
+</workflow-app>
+
+<!--
+     <workflow>
+  <node name="start" x="20" y="245"/>
+  <node name="localFStoHDFC" x="448" y="173"/>
+  <node name="handleFailure" x="294" y="334"/>
+  <node name="java-1" x="195" y="202"/>
+  <node name="decision-1" x="309" y="192"/>
+  <node name="end" x="579" y="242"/>
+</workflow>-->

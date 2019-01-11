@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="dimHotelMdmSqoopImport">
+<start to="impirtDimHotelMdm"/>
+  
+  <action name="impirtDimHotelMdm">
+                <shell xmlns="uri:oozie:shell-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                <exec>${sqoopImportScrit}</exec>
+					
+                <argument>${MYSQL_HOST}</argument>
+				<argument>${MYSQL_USER_NAME}</argument>
+				<argument>${MYSQL_PASSWORD}</argument>
+                <argument>${MYSQL_DB_NAME}</argument>
+                <argument>${MYSQL_TABLE_NAME_A}</argument>
+				<argument>${HIVE_DB_NAME}</argument>
+				<argument>${HIVE_TABLE_NAME_A}</argument>
+                <argument>${HIVE_TEMP_TABLE_NAME_A}</argument>
+				<argument>${SQOOP_TARGET_DIR_A}</argument>
+				<argument>${DELEMETER_A}</argument>
+					
+                <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                <file>${sqoopImportScritPath}#${sqoopImportScrit}</file>
+                </shell>
+                <ok to="end"/>
+                <error to="fail"/>
+        </action>
+
+<kill name="fail">
+  <message>workflow failed</message>
+</kill>
+  <end name="end"/>
+</workflow-app>

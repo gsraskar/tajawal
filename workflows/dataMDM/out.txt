@@ -1,0 +1,6 @@
+Warning: Using a password on the command line interface can be insecure.
+Warning: Using a password on the command line interface can be insecure.
+Warning: Using a password on the command line interface can be insecure.
+Warning: Using a password on the command line interface can be insecure.
+ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'Jun 20 13:16:12 UTC 2018) as min_date,
+		max(Wed Jun 20 13:16:12 UTC 2018) as ma' at line 6

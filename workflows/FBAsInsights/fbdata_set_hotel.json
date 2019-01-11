@@ -1,0 +1,145 @@
+{
+  "data_sets": [
+    {
+      "data_set_name": "fact_facebook_spend",
+      "fields": [
+        {
+          "fieldName": "account_id",
+          "jsonKeyName": "account_id",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "account_name",
+          "jsonKeyName": "account_name",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "ad_id",
+          "jsonKeyName": "ad_id",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "ad_name",
+          "jsonKeyName": "ad_name",
+          "index": 3,
+          "mapFunctionName": "STR_REPLACE(ad_name,'\n','')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "adset_id",
+          "jsonKeyName": "adset_id",
+          "index": 4,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "adset_name",
+          "jsonKeyName": "adset_name",
+          "index": 5,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "campaign_id",
+          "jsonKeyName": "campaign_id",
+          "index": 6,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "campaign_name",
+          "jsonKeyName": "campaign_name",
+          "index": 7,
+          "keyValueFlag": "key"
+        },
+{
+          "jsonKeyName": "impressions",
+          "index": 8,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "clicks",
+          "jsonKeyName": "clicks",
+          "index": 9,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cpc",
+          "jsonKeyName": "cpc",
+          "index": 10,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cpm",
+          "jsonKeyName": "cpm",
+          "index": 11,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cpp",
+          "jsonKeyName": "cpp",
+          "index": 12,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "ctr",
+          "jsonKeyName": "ctr",
+          "index": 13,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "deeplink_clicks",
+          "jsonKeyName": "deeplink_clicks",
+          "index": 14,
+          "mapFunctionName": "COALESCE(deeplink_clicks,'0.0')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "date_start",
+          "jsonKeyName": "date_start",
+          "index": 15,
+          "mapFunctionName": "DATE_FORMAT(date_start, \"yyyy-MM-dd\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "date_stop",
+          "jsonKeyName": "date_stop",
+          "index": 16,
+          "mapFunctionName": "DATE_FORMAT(date_stop, \"yyyy-MM-dd\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "inline_link_clicks",
+          "jsonKeyName": "inline_link_clicks",
+          "index": 17,
+          "mapFunctionName": "COALESCE(inline_link_clicks,'0.0')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "spend",
+          "jsonKeyName": "spend",
+          "index": 18,
+          "keyValueFlag": "key"
+        },
+	{			
+          "jsonKeyName": "website_clicks",
+          "index": 19,
+          "mapFunctionName": "COALESCE(website_clicks,'0.0')",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "country",
+          "jsonKeyName": "country",
+          "index": 20,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "region",
+          "jsonKeyName": "region",
+          "index": 21,
+          "keyValueFlag": "key"
+        }
+      ]
+    }
+  ]
+}

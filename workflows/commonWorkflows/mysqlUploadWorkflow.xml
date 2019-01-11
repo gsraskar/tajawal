@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="mysqlUploadWorkflow-${module}.xml">
+  <start to="preSqoopAction"/>
+  <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <action name="preSqoopAction">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${preSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable1}</argument>
+      <argument>${mysqlIntermediateTable1}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${preSqoopActionScriptPath}#${preSqoopActionScript}</file>
+    </shell>
+    <ok to="sqoopExportNode"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="sqoopExportNode">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlIntermediateTable1} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTable1}/*" --input-fields-terminated-by "\t" --input-null-string "\\N" --input-null-non-string "\\N"</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="postSqoopAction"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="postSqoopAction">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${postSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable1}</argument>
+      <argument>${mysqlIntermediateTable1}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${postSqoopActionScriptPath}#${postSqoopActionScript}</file>
+    </shell>
+    <ok to="decision-1"/>
+    <error to="handleFailure"/>
+  </action>
+  <decision name="decision-1">
+    <switch>
+      <case to="preSqoopAction_Second">${uploadMySQLTable2 eq 'true'}</case>
+      <default to="decision-2"/>
+    </switch>
+  </decision>
+  <action name="preSqoopAction_Second">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${preSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable2}</argument>
+      <argument>${mysqlIntermediateTable2}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${preSqoopActionScriptPath}#${preSqoopActionScript}</file>
+    </shell>
+    <ok to="sqoopExportNode_Second"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="sqoopExportNode_Second">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlIntermediateTable2} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTable2}/*" --input-fields-terminated-by "\t" --input-null-string "\\N" --input-null-non-string "\\N"</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="postSqoopAction_second"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="postSqoopAction_second">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${postSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable2}</argument>
+      <argument>${mysqlIntermediateTable2}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${postSqoopActionScriptPath}#${postSqoopActionScript}</file>
+    </shell>
+    <ok to="decision-2"/>
+    <error to="handleFailure"/>
+  </action>
+  <decision name="decision-2">
+    <switch>
+      <case to="preSqoopAction_Third">${uploadMySQLTable3 eq 'true'}</case>
+      <default to="decision-3"/>
+    </switch>
+  </decision>
+  <action name="preSqoopAction_Third">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${preSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable3}</argument>
+      <argument>${mysqlIntermediateTable3}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${preSqoopActionScriptPath}#${preSqoopActionScript}</file>
+    </shell>
+    <ok to="sqoopExportNode_Third"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="sqoopExportNode_Third">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlIntermediateTable3} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTable3}/*" --input-fields-terminated-by "\t" --input-null-string "\\N" --input-null-non-string "\\N"</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="postSqoopAction_Third"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="postSqoopAction_Third">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${postSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable3}</argument>
+      <argument>${mysqlIntermediateTable3}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${postSqoopActionScriptPath}#${postSqoopActionScript}</file>
+    </shell>
+    <ok to="decision-3"/>
+    <error to="handleFailure"/>
+  </action>
+  <decision name="decision-3">
+    <switch>
+      <case to="preSqoopAction_Fourth">${uploadMySQLTable4 eq 'true'}</case>
+      <default to="decision-4"/>
+    </switch>
+  </decision>
+  <action name="preSqoopAction_Fourth">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${preSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable4}</argument>
+      <argument>${mysqlIntermediateTable4}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${preSqoopActionScriptPath}#${preSqoopActionScript}</file>
+    </shell>
+    <ok to="sqoopExportNode_Fourth"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="sqoopExportNode_Fourth">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlIntermediateTable4} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTable4}/*" --input-fields-terminated-by "\t" --input-null-string "\\N" --input-null-non-string "\\N"</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="postSqoopAction_Fourth"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="postSqoopAction_Fourth">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${postSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable4}</argument>
+      <argument>${mysqlIntermediateTable4}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${postSqoopActionScriptPath}#${postSqoopActionScript}</file>
+    </shell>
+    <ok to="decision-4"/>
+    <error to="handleFailure"/>
+  </action>
+
+  <decision name="decision-4">
+    <switch>
+      <case to="preSqoopAction_Fifth">${uploadMySQLTable5 eq 'true'}</case>
+      <default to="end"/>
+    </switch>
+  </decision>
+  <action name="preSqoopAction_Fifth">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${preSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable5}</argument>
+      <argument>${mysqlIntermediateTable5}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${preSqoopActionScriptPath}#${preSqoopActionScript}</file>
+    </shell>
+    <ok to="sqoopExportNode_Fifth"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="sqoopExportNode_Fifth">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlIntermediateTable5} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTable5}/*" --input-fields-terminated-by "\t" --input-null-string "\\N" --input-null-non-string "\\N"</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="postSqoopAction_Fifth"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="postSqoopAction_Fifth">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${postSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable5}</argument>
+      <argument>${mysqlIntermediateTable5}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${postSqoopActionScriptPath}#${postSqoopActionScript}</file>
+    </shell>
+    <ok to="decision-5"/>
+    <error to="handleFailure"/>
+  </action>
+<decision name="decision-5">
+    <switch>
+      <case to="preSqoopAction_Sixth">${uploadMySQLTable6 eq 'true'}</case>
+      <default to="end"/>
+    </switch>
+  </decision>
+ <action name="preSqoopAction_Sixth">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${preSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable6}</argument>
+      <argument>${mysqlIntermediateTable6}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${preSqoopActionScriptPath}#${preSqoopActionScript}</file>
+    </shell>
+    <ok to="sqoopExportNode_Sixth"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="sqoopExportNode_Sixth">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlIntermediateTable6} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTable6}/*" --input-fields-terminated-by "\t" --input-null-string "\\N" --input-null-non-string "\\N"</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="postSqoopAction_sixth"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="postSqoopAction_sixth">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${postSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable6}</argument>
+      <argument>${mysqlIntermediateTable6}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${postSqoopActionScriptPath}#${postSqoopActionScript}</file>
+    </shell>
+    <ok to="decision-6"/>
+    <error to="handleFailure"/>
+  </action>
+<decision name="decision-6">
+    <switch>
+      <case to="preSqoopAction_Seventh">${uploadMySQLTable7 eq 'true'}</case>
+      <default to="end"/>
+    </switch>
+  </decision>
+ <action name="preSqoopAction_Seventh">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${preSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable7}</argument>
+      <argument>${mysqlIntermediateTable7}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${preSqoopActionScriptPath}#${preSqoopActionScript}</file>
+    </shell>
+    <ok to="sqoopExportNode_Seventh"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="sqoopExportNode_Seventh">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlIntermediateTable7} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTable7}/*" --input-fields-terminated-by "\t" --input-null-string "\\N" --input-null-non-string "\\N"</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="postSqoopAction_Seventh"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="postSqoopAction_Seventh">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${postSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable7}</argument>
+      <argument>${mysqlIntermediateTable7}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${postSqoopActionScriptPath}#${postSqoopActionScript}</file>
+    </shell>
+    <ok to="decision-7"/>
+    <error to="handleFailure"/>
+  </action>
+<decision name="decision-7">
+    <switch>
+      <case to="preSqoopAction_Eight">${uploadMySQLTable8 eq 'true'}</case>
+      <default to="end"/>
+    </switch>
+  </decision>
+ <action name="preSqoopAction_Eight">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${preSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable8}</argument>
+      <argument>${mysqlIntermediateTable8}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${preSqoopActionScriptPath}#${preSqoopActionScript}</file>
+    </shell>
+    <ok to="sqoopExportNode_Eight"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="sqoopExportNode_Eight">
+    <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <configuration>
+        <property>
+          <name>mapred.compress.map.output</name>
+          <value>true</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+      <command>export -libjars ${libjarsname} -connect jdbc:mysql://${mysqlServer}:3306/${mysqlDatabase} --username ${mysqlUser} --password ${mysqlPassword} --table ${mysqlIntermediateTable8} --export-dir "${hiveWareHousePath}/${hiveDB}.db/${hiveTable8}/*" --input-fields-terminated-by "\t" --input-null-string "\\N" --input-null-non-string "\\N"</command>
+      <file>${libjarspath}#${libjarsname}</file>
+    </sqoop>
+    <ok to="postSqoopAction_Eight"/>
+    <error to="handleFailure"/>
+  </action>
+  <action name="postSqoopAction_Eight">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${postSqoopActionScript}</exec>
+      <argument>${mysqlUser}</argument>
+      <argument>${mysqlPassword}</argument>
+      <argument>${mysqlDatabase}</argument>
+      <argument>${mysqlFinalTable8}</argument>
+      <argument>${mysqlIntermediateTable8}</argument>
+      <argument>${mysqlServer}</argument>
+      <file>${postSqoopActionScriptPath}#${postSqoopActionScript}</file>
+    </shell>
+    <ok to="end"/>
+    <error to="handleFailure"/>
+  </action>
+
+  <kill name="kill-1">
+    <message>Failure in commonworkflow mysql upload</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+<!--
+     <workflow>
+  <node name="start" x="6" y="441"/>
+  <node name="executeSQL" x="83" y="380"/>
+  <node name="handleFailure" x="602" y="418"/>
+  <node name="preSqoopAction" x="155" y="314"/>
+  <node name="sqoopExportNode" x="228" y="252"/>
+  <node name="postSqoopAction" x="307" y="185"/>
+  <node name="decision-1" x="444" y="203"/>
+  <node name="preSqoopAction_Second" x="511" y="151"/>
+  <node name="sqoopExportNode_Second" x="590" y="106"/>
+  <node name="postSqoopAction_second" x="668" y="46"/>
+  <node name="kill-1" x="809" y="412"/>
+  <node name="end" x="807" y="266"/>
+</workflow>-->
+

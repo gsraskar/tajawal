@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "tajawal-extrapreneurs",
+  "private_key_id": "53055660971cd06c9d78aa2bb104140f5261703d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC48u2cp642TbtP\nWVKn2wpPgBpecmwaxNGZi198NZooUvf2nLrgmDLMnYkhIYW2LObHc8RU8SApHTzC\nmhLGJxh/jHsLjVzeFnwW8A+ZWpvvSeeCYzjpAOwKr5nGrIsF+ppMxyNeG2qQKNmw\nZRzwNR6I1oQi7OIWcYmHO6UPyPYDre2dlBXJwIHG64xgbkqyAbnOenuprniSD/HL\ngwtgEgSBt9+iSix84FxD8GKJwEtlHYgkxlMiK5mBn0ipCHtyMC9Mbp9ec7n9jLdK\nUqVySiVNtTvTafg7we3Q9LzLjshEP0R2YFRHAL7S59v2pAYrWSGcF+tFcEVJMUf1\n1+G9mdRzAgMBAAECggEAPo0CqenYNMuDXynRl62wRgUIZgsC3ubUEL8fcy3ZzmuJ\nK6IEXjN7ctKQ72CcDWoQP0K7ExNeEimuRA7B7LyKP5EuiFCuKPqny0YzsGUBuiNf\npiySsdM7Ab40Hwp6FnKUPwVWw9w35Tu7rDn2WJNOmW8bz4gYSwjpP5B/meAYvFNA\nmqqp4yhI3hApTs0i3uZpjdMPDlgYF949kxCfTaJTNfI7DkV3BnV7A8E0z5tfD6PD\nkw6ngzSczkCLUK4jbKd55/q7dBqJ3zP27ffGnu/7gS2zVuabX7PzofTKm8S1ATSj\nO21VhU10qH5l4O2FMLYjjmyNWDegXYZqEVxS0tzGMQKBgQD/61dyZ1q/T+M2xTq6\nIeUI//NIHDw/iwCiXw+n7C54AVfhF77iKf8PsVTOVgvYvsJOiFbUiHKDetWUHmYI\nmeBxFJUAc+INQQaQIgS1IRHC6/u5iDTQbKbZzVpjkWmHJGH2ZcKpKqSgLUKuwgjC\n7Lw3mofIffOd6SfuzqpmoyoH2QKBgQC5AduRW3c2BB+08DDas0cbi/W72Kr8FH0B\nK61x3SJngSe/PijfHrQ89GiLrjARjRB+6V2e2VZnqWGQ9EZZirizWyxhlsyCaNwO\n8zDKvNtbitzJlViWQW7STA+kJNIw96cEH2qG2UpwAQavzmL9sHpglK6wBhBScrn+\no+wA1ee7KwKBgQDZl5XQdcQYqan8pZEbNTpxfn2xMCChvmQZqk27bvrLmgjIH9Jy\npVZyV0pN7adA8GBxOUbqieEjnUr/FyGV6o+EVgWiTuVCc6lK30G1Z5qcatyqkP6m\nv9rVkN5rjfV1rB+GylrKTrGOZy0tPVkJsxMNC9yrQTvjZZxIVXtYrR5NcQKBgQCp\nFfqP4hGVC7XSz8dGyp1NnuArG75B/5O0EzBFJb9A6/jgv7XpHg3Ku/Ik30FNeSi/\nZRfMi4R933+tVKRLSA7A1a49Tu6ArceZ3kgUswCkrMhXcKhzQ0A+8YdGFOUKHf3G\nNdRNhKCUt0teOHmetMFULe9uL0yRngtBoJ2cseNF2wKBgQCaEPgyZZIOtAwBjteF\nvWTTX9BeJm+MUMT9sIE09KycKjMK2GG6KTEBB/9GrhZoINU47bXOocfDryKb6Xv7\ndFliP6x60OKqa+8P9ogx/J7fB+NOdwZCTbHlTQX3FsZlkNFfeeeoZik4Cn0JiWxD\nKU2oc5sCDx9fI/0/a6VeoB3GjA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "tajawal-extrapreneurs@tajawal-extrapreneurs.iam.gserviceaccount.com",
+  "client_id": "105590489659705659704",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/tajawal-extrapreneurs%40tajawal-extrapreneurs.iam.gserviceaccount.com"
+}

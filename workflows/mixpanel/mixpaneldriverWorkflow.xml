@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="DriverWorkflowMixpnel.xml">
+  <start to="shell-crunch-action"/>
+ <!--start to="uplaodToMysql"/-->
+
+<!-- Fork-1 goes to join 1 -->
+<action name="shell-crunch-action">
+	<shell xmlns="uri:oozie:shell-action:0.2">
+                         <job-tracker>${jobTracker}</job-tracker>
+                         <name-node>${nameNode}</name-node>
+                <configuration>
+                         <property>
+                                   <name>yarn.nodemanager.container-executor.class</name>
+                                   <value>LinuxContainerExecutor</value>
+                         </property>
+                         <property>
+                                   <name>yarn.nodemanager.linux-container-executor.nonsecure-mode.limit-user</name>
+                                   <value>true</value>
+                         </property>
+                </configuration>
+                        <exec>${mapreduceExecutorScriptName}</exec>
+                  <argument>${dataSetPath}</argument>
+                  <argument>${inPutPath}</argument>
+                  <argument>${outPutPath}</argument>
+                  <argument>${inputDataType}</argument>
+                  <argument>${libHdfsDirPath}</argument>
+		<env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+                  <file>${mapreduceExecutorScriptPath}#${mapreduceExecutorScriptName}</file>
+                </shell>
+                <ok to="end"/>
+                <error to="kill"/>
+        </action>
+<!--
+ <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>facebook</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action> -->
+  <kill name="kill">
+    <message>Some failure occurred</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+
+
+
+

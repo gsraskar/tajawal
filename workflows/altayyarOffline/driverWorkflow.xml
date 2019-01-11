@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="DriverWorkflowTajawalAltayyarOffline.xml">
+  <!--start to="altayyar_uplaodToMysql"/-->
+  <start to="altayyaroffline_loadToHive"/>
+<action name="altayyar_copyTo_hdfs">
+                <shell xmlns="uri:oozie:shell-action:0.1">
+                         <job-tracker>${jobTracker}</job-tracker>
+                         <name-node>${nameNode}</name-node>
+                         <exec>copy2.sh</exec>
+                         <argument>key.pem</argument>
+                         <argument>${user_ip}</argument>
+                         <argument>${src_loc}</argument>
+                         <argument>${dest_loc}</argument>
+                         <file>${copyScriptPath}#copy2.sh</file>
+                         <file>${pemFile}#key.pem</file>
+                </shell>
+                <ok to='altayyar_copyTo_hdfs2'/>
+                <error to='kill-1'/>
+        </action>
+<action name="altayyar_copyTo_hdfs2">
+                <shell xmlns="uri:oozie:shell-action:0.1">
+                         <job-tracker>${jobTracker}</job-tracker>
+                         <name-node>${nameNode}</name-node>
+                         <exec>copy2.sh</exec>
+                         <argument>key.pem</argument>
+                         <argument>${user_ip}</argument>
+                         <argument>${src_loc1}</argument>
+                         <argument>${dest_loc1}</argument>
+                         <file>${copyScriptPath}#copy2.sh</file>
+                         <file>${pemFile}#key.pem</file>
+                </shell>
+                <ok to='altayyaroffline_loadToHive'/>
+                <error to='kill-1'/>
+        </action>
+
+<action name="altayyaroffline_loadToHive">
+  <sub-workflow>
+    <app-path>${oozieProjectRoot}/commonWorkflows/mongoTransform.xml</app-path>
+<propagate-configuration/>
+  </sub-workflow>
+  <!--ok to="end"/-->
+  <ok to="altayyar_uplaodToMysql"/>
+  <error to="handleFailure"/>
+</action>
+<action name="altayyar_uplaodToMysql">
+    <sub-workflow>
+        <app-path>${oozieProjectRoot}/commonWorkflows/mysqlUploadWorkflow.xml</app-path>
+<propagate-configuration/>
+    </sub-workflow>
+    <ok to="end"/>
+    <error to="handleFailure"/>
+</action>
+
+ <action name="handleFailure">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>failureHandler.sh</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailure}#failureHandler.sh</file>
+    </shell>
+    <ok to="kill-1"/>
+    <error to="kill-1"/>
+  </action>
+  <kill name="kill-1">
+    <message>Some failure occurred</message>
+  </kill>
+  <end name="end"/>
+</workflow-app>
+
+
+

@@ -1,0 +1,101 @@
+{
+  "data_sets": [
+    {
+      "data_set_name": "facebook_data",
+      "fields": [
+        {
+          "fieldName": "impressions",
+          "jsonKeyName": "impressions",
+          "index": 0,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "ad_id",
+          "jsonKeyName": "ad_id",
+          "index": 1,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "adset_id",
+          "jsonKeyName": "adset_id",
+          "index": 2,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "campaign_id",
+          "jsonKeyName": "campaign_id",
+          "index": 3,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "clicks",
+          "jsonKeyName": "clicks",
+          "index": 4,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cost_per_action_type",
+          "jsonKeyName": "cost_per_action_type=>action_type",
+          "index": 5,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cost_per_value",
+          "jsonKeyName": "cost_per_action_type=>value",
+          "index": 6,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cpc",
+          "jsonKeyName": "cpc",
+          "index": 7,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "cpm",
+          "jsonKeyName": "cpm",
+          "index": 8,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "reach",
+          "jsonKeyName": "reach",
+          "index": 9,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "actions_action_type",
+          "jsonKeyName": "actions=>action_type",
+          "index": 10,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "actions_value",
+          "jsonKeyName": "actions=>value",
+          "index": 11,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "spend",
+          "jsonKeyName": "spend",
+          "index": 12,
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "start_date",
+          "jsonKeyName": "date_start",
+          "index": 13,
+          "mapFunctionName": "DATE_FORMAT(date_start, \"yyyy-MM-dd\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        },
+        {
+          "fieldName": "stop_date",
+          "jsonKeyName": "date_stop",
+          "index": 14,
+          "mapFunctionName": "DATE_FORMAT(date_stop, \"yyyy-MM-dd\", \"yyyyMMdd\")",
+          "keyValueFlag": "key"
+        }
+      ]
+    }
+  ]
+}

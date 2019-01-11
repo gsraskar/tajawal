@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="facebookdownload-${module}.xml">
+  <!--start to="java-1"/-->
+<start to="getFbExecTime"/>
+<action name="getFbExecTime">
+  <shell xmlns="uri:oozie:shell-action:0.3">
+     <job-tracker>${jobTracker}</job-tracker>
+     <name-node>${nameNode}</name-node>
+     <exec>${getFbExecTimeScript}</exec>
+     <argument>facebookIntermediate</argument>
+     <file>${getFbExecTimeScriptPath}#${getFbExecTimeScript}</file>
+     <capture-output/>
+  </shell>
+     <ok to="java-1"/>
+     <error to="fail"/>
+</action>
+  <action name="localFStoHDFC">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${copyHDFSScript}</exec>
+      <argument>${localFSDirectory}</argument>
+      <argument>${HDFSFilePath}</argument>
+      <file>${copyHDFSScriptPath}#${copyHDFSScript}</file>
+      <file>${pemFile}#key.pem</file>
+    </shell>
+    <ok to="end"/>
+    <error to="handleFailure1"/>
+  </action>
+  <action name="handleFailure1">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <exec>${handleFailureScript}</exec>
+      <argument>${failureMailReciver}</argument>
+      <argument>${wf:name()}</argument>
+      <argument>failed</argument>
+      <argument>${wf:id()}</argument>
+      <file>${handleFailureScriptPath}#${handleFailureScript}</file>
+    </shell>
+    <ok to="end"/>
+    <error to="fail"/>
+  </action>
+  <action name="java-1">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>${ClassPath}</main-class>
+      <arg>--selection-config-file</arg>
+      <arg>${ResourceFile}</arg>
+      <arg>--output-file-path</arg>
+      <arg>${localFSPath}</arg>
+      <arg>--ad_object_id</arg>
+      <arg>${ObjectID}</arg>
+      <arg>--access_token</arg>
+      <arg>${AccessToken}</arg>
+	<arg>--start-date</arg>
+	<arg>${wf:actionData("getFbExecTime")["date_range_since"]}</arg>
+ <!--arg>2018-03-22</arg-->
+	<arg>--end-date</arg>
+	<arg>${wf:actionData("getFbExecTime")["date_range_till"]}</arg>
+<!--arg>2018-03-14</arg-->
+     <file>${ResourceFilePath}#${ResourceFile}</file>
+    </java>
+    <ok to="decision-1"/>
+    <error to="handleFailure1"/>
+  </action>
+ <action name="java-2">
+    <java>
+      <job-tracker>${jobTracker}</job-tracker>
+      <name-node>${nameNode}</name-node>
+      <main-class>${ClassPath}</main-class>
+      <arg>--selection-config-file</arg>
+      <arg>${ResourceFile}</arg>
+      <arg>--output-file-path</arg>
+      <arg>${localFSPath1}</arg>
+      <arg>--ad_object_id</arg>
+      <arg>${ObjectID1}</arg>
+      <arg>--access_token</arg>
+      <arg>${AccessToken1}</arg>
+        <arg>--start-date</arg>
+        <!--arg>${wf:actionData("getFbExecTime")["date_range_since"]}</arg-->
+ <arg>2017-06-02</arg>
+        <arg>--end-date</arg>
+        <!--arg>${wf:actionData("getFbExecTime")["date_range_till"]}</arg-->
+<arg>2017-09-19</arg>
+      <file>${ResourceFilePath}#${ResourceFile}</file>
+    </java>
+    <ok to="decision-1"/>
+    <error to="handleFailure1"/>
+  </action>
+
+<kill name="fail">
+  <message>workflow failed</message>
+</kill>
+  <decision name="decision-1">
+    <switch>
+      <case to="localFStoHDFC">${UploadtoHDFS eq 'true'}</case>
+      <default to="end"/>
+    </switch>
+  </decision>
+  <end name="end"/>
+</workflow-app>
+<!--
+     <workflow>
+  <node name="start" x="20" y="245"/>
+  <node name="localFStoHDFC" x="448" y="173"/>
+  <node name="handleFailure" x="294" y="334"/>
+  <node name="java-1" x="195" y="202"/>
+  <node name="decision-1" x="309" y="192"/>
+  <node name="end" x="579" y="242"/>
+</workflow>-->
